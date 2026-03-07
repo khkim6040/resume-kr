@@ -1,0 +1,99 @@
+"use client";
+
+import { useResumeStore } from "@/store/resume";
+import type { Project } from "@/types/resume";
+
+const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
+
+export default function ProjectsEditor() {
+  const { data, addProject, updateProject, removeProject } = useResumeStore();
+  const items = data.projects;
+
+  function addItem() {
+    const item: Project = {
+      id: crypto.randomUUID(),
+      name: "",
+      startDate: "",
+      description: [],
+    };
+    addProject(item);
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {items.map((item) => (
+        <div key={item.id} className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-4">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="프로젝트명"
+              value={item.name}
+              onChange={(e) => updateProject(item.id, { name: e.target.value })}
+              className={`${INPUT} flex-1`}
+            />
+            <input
+              type="text"
+              placeholder="역할 (선택)"
+              value={item.role ?? ""}
+              onChange={(e) => updateProject(item.id, { role: e.target.value })}
+              className={`${INPUT} flex-1`}
+            />
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="시작일 (예: 2023.01)"
+              value={item.startDate}
+              onChange={(e) => updateProject(item.id, { startDate: e.target.value })}
+              className={`${INPUT} flex-1`}
+            />
+            <input
+              type="text"
+              placeholder="종료일 (선택)"
+              value={item.endDate ?? ""}
+              onChange={(e) => updateProject(item.id, { endDate: e.target.value })}
+              className={`${INPUT} flex-1`}
+            />
+          </div>
+          <textarea
+            placeholder="프로젝트 설명 (줄바꿈으로 항목 구분)"
+            value={item.description.join("\n")}
+            onChange={(e) => updateProject(item.id, { description: e.target.value.split("\n") })}
+            rows={3}
+            className={INPUT}
+          />
+          <input
+            type="text"
+            placeholder="기술 스택 (쉼표로 구분: React, Node.js)"
+            value={(item.techStack ?? []).join(", ")}
+            onChange={(e) =>
+              updateProject(item.id, {
+                techStack: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+              })
+            }
+            className={INPUT}
+          />
+          <input
+            type="url"
+            placeholder="링크 (선택)"
+            value={item.link ?? ""}
+            onChange={(e) => updateProject(item.id, { link: e.target.value })}
+            className={INPUT}
+          />
+          <button
+            onClick={() => removeProject(item.id)}
+            className="self-end text-xs text-red-500 hover:text-red-700"
+          >
+            삭제
+          </button>
+        </div>
+      ))}
+      <button
+        onClick={addItem}
+        className="rounded-md border border-dashed border-zinc-300 px-3 py-2 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-700"
+      >
+        + 프로젝트 추가
+      </button>
+    </div>
+  );
+}
