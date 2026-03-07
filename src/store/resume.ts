@@ -41,6 +41,7 @@ const defaultResumeData: ResumeData = {
 
 interface ResumeStore {
   data: ResumeData;
+  dataVersion: number;
   setData: (data: ResumeData) => void;
   updatePersonalInfo: (info: Partial<ResumeData["personalInfo"]>) => void;
   setSections: (sections: Section[]) => void;
@@ -110,30 +111,38 @@ function makeArrayActions<T extends { id: string }>(
 export const useResumeStore = create<ResumeStore>()(
   persist(
     (set) => {
-      const work = makeArrayActions<WorkExperience>("workExperience", set);
-      const edu = makeArrayActions<Education>("education", set);
-      const skill = makeArrayActions<Skill>("skills", set);
-      const project = makeArrayActions<Project>("projects", set);
-      const cert = makeArrayActions<Certificate>("certificates", set);
-      const lang = makeArrayActions<Language>("languages", set);
-      const award = makeArrayActions<Award>("awards", set);
+      // Wrap set to auto-increment dataVersion on every mutation
+      const vSet: typeof set = (fn) =>
+        set((state) => {
+          const result = typeof fn === "function" ? fn(state) : fn;
+          return { ...result, dataVersion: state.dataVersion + 1 };
+        });
+
+      const work = makeArrayActions<WorkExperience>("workExperience", vSet);
+      const edu = makeArrayActions<Education>("education", vSet);
+      const skill = makeArrayActions<Skill>("skills", vSet);
+      const project = makeArrayActions<Project>("projects", vSet);
+      const cert = makeArrayActions<Certificate>("certificates", vSet);
+      const lang = makeArrayActions<Language>("languages", vSet);
+      const award = makeArrayActions<Award>("awards", vSet);
 
       return {
         data: defaultResumeData,
-        setData: (data) => set({ data }),
+        dataVersion: 0,
+        setData: (data) => vSet({ data }),
         updatePersonalInfo: (info) =>
-          set((state) => ({
+          vSet((state) => ({
             data: {
               ...state.data,
               personalInfo: { ...state.data.personalInfo, ...info },
             },
           })),
         setSections: (sections) =>
-          set((state) => ({
+          vSet((state) => ({
             data: { ...state.data, sections },
           })),
         reorderSections: (fromIndex, toIndex) =>
-          set((state) => {
+          vSet((state) => {
             const sections = [...state.data.sections].sort(
               (a, b) => a.order - b.order,
             );
@@ -147,7 +156,7 @@ export const useResumeStore = create<ResumeStore>()(
             };
           }),
         toggleSectionVisibility: (sectionId) =>
-          set((state) => ({
+          vSet((state) => ({
             data: {
               ...state.data,
               sections: state.data.sections.map((s) =>
@@ -187,6 +196,7 @@ export const useResumeStore = create<ResumeStore>()(
     },
     {
       name: "resume-kr-storage",
+      partialize: (state) => ({ data: state.data }),
     },
   ),
 );
