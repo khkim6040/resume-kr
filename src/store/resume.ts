@@ -1,5 +1,16 @@
 import { create } from "zustand";
-import type { ResumeData, Section } from "@/types/resume";
+import { persist } from "zustand/middleware";
+import type {
+  ResumeData,
+  Section,
+  WorkExperience,
+  Education,
+  Skill,
+  Project,
+  Certificate,
+  Language,
+  Award,
+} from "@/types/resume";
 
 const defaultSections: Section[] = [
   { id: "sec-personal", type: "personalInfo", title: "인적사항", visible: true, order: 0 },
@@ -33,20 +44,149 @@ interface ResumeStore {
   setData: (data: ResumeData) => void;
   updatePersonalInfo: (info: Partial<ResumeData["personalInfo"]>) => void;
   setSections: (sections: Section[]) => void;
+  reorderSections: (fromIndex: number, toIndex: number) => void;
+  toggleSectionVisibility: (sectionId: string) => void;
+
+  addWorkExperience: (item: WorkExperience) => void;
+  updateWorkExperience: (id: string, item: Partial<WorkExperience>) => void;
+  removeWorkExperience: (id: string) => void;
+
+  addEducation: (item: Education) => void;
+  updateEducation: (id: string, item: Partial<Education>) => void;
+  removeEducation: (id: string) => void;
+
+  addSkill: (item: Skill) => void;
+  updateSkill: (id: string, item: Partial<Skill>) => void;
+  removeSkill: (id: string) => void;
+
+  addProject: (item: Project) => void;
+  updateProject: (id: string, item: Partial<Project>) => void;
+  removeProject: (id: string) => void;
+
+  addCertificate: (item: Certificate) => void;
+  updateCertificate: (id: string, item: Partial<Certificate>) => void;
+  removeCertificate: (id: string) => void;
+
+  addLanguage: (item: Language) => void;
+  updateLanguage: (id: string, item: Partial<Language>) => void;
+  removeLanguage: (id: string) => void;
+
+  addAward: (item: Award) => void;
+  updateAward: (id: string, item: Partial<Award>) => void;
+  removeAward: (id: string) => void;
 }
 
-export const useResumeStore = create<ResumeStore>((set) => ({
-  data: defaultResumeData,
-  setData: (data) => set({ data }),
-  updatePersonalInfo: (info) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        personalInfo: { ...state.data.personalInfo, ...info },
-      },
-    })),
-  setSections: (sections) =>
-    set((state) => ({
-      data: { ...state.data, sections },
-    })),
-}));
+function makeArrayActions<T extends { id: string }>(
+  key: keyof ResumeData,
+  set: (fn: (state: { data: ResumeData }) => { data: ResumeData }) => void,
+) {
+  return {
+    add: (item: T) =>
+      set((state) => ({
+        data: {
+          ...state.data,
+          [key]: [...(state.data[key] as unknown as T[]), item],
+        },
+      })),
+    update: (id: string, partial: Partial<T>) =>
+      set((state) => ({
+        data: {
+          ...state.data,
+          [key]: (state.data[key] as unknown as T[]).map((item) =>
+            item.id === id ? { ...item, ...partial } : item,
+          ),
+        },
+      })),
+    remove: (id: string) =>
+      set((state) => ({
+        data: {
+          ...state.data,
+          [key]: (state.data[key] as unknown as T[]).filter((item) => item.id !== id),
+        },
+      })),
+  };
+}
+
+export const useResumeStore = create<ResumeStore>()(
+  persist(
+    (set) => {
+      const work = makeArrayActions<WorkExperience>("workExperience", set);
+      const edu = makeArrayActions<Education>("education", set);
+      const skill = makeArrayActions<Skill>("skills", set);
+      const project = makeArrayActions<Project>("projects", set);
+      const cert = makeArrayActions<Certificate>("certificates", set);
+      const lang = makeArrayActions<Language>("languages", set);
+      const award = makeArrayActions<Award>("awards", set);
+
+      return {
+        data: defaultResumeData,
+        setData: (data) => set({ data }),
+        updatePersonalInfo: (info) =>
+          set((state) => ({
+            data: {
+              ...state.data,
+              personalInfo: { ...state.data.personalInfo, ...info },
+            },
+          })),
+        setSections: (sections) =>
+          set((state) => ({
+            data: { ...state.data, sections },
+          })),
+        reorderSections: (fromIndex, toIndex) =>
+          set((state) => {
+            const sections = [...state.data.sections].sort(
+              (a, b) => a.order - b.order,
+            );
+            const [moved] = sections.splice(fromIndex, 1);
+            sections.splice(toIndex, 0, moved);
+            return {
+              data: {
+                ...state.data,
+                sections: sections.map((s, i) => ({ ...s, order: i })),
+              },
+            };
+          }),
+        toggleSectionVisibility: (sectionId) =>
+          set((state) => ({
+            data: {
+              ...state.data,
+              sections: state.data.sections.map((s) =>
+                s.id === sectionId ? { ...s, visible: !s.visible } : s,
+              ),
+            },
+          })),
+
+        addWorkExperience: work.add,
+        updateWorkExperience: work.update,
+        removeWorkExperience: work.remove,
+
+        addEducation: edu.add,
+        updateEducation: edu.update,
+        removeEducation: edu.remove,
+
+        addSkill: skill.add,
+        updateSkill: skill.update,
+        removeSkill: skill.remove,
+
+        addProject: project.add,
+        updateProject: project.update,
+        removeProject: project.remove,
+
+        addCertificate: cert.add,
+        updateCertificate: cert.update,
+        removeCertificate: cert.remove,
+
+        addLanguage: lang.add,
+        updateLanguage: lang.update,
+        removeLanguage: lang.remove,
+
+        addAward: award.add,
+        updateAward: award.update,
+        removeAward: award.remove,
+      };
+    },
+    {
+      name: "resume-kr-storage",
+    },
+  ),
+);
