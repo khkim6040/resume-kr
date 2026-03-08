@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/resume";
 import type { Project } from "@/types/resume";
+import TagInput from "../TagInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -62,16 +63,10 @@ export default function ProjectsEditor() {
             rows={3}
             className={INPUT}
           />
-          <input
-            type="text"
-            placeholder="기술 스택 (쉼표로 구분: React, Node.js)"
-            value={(item.techStack ?? []).join(", ")}
-            onChange={(e) =>
-              updateProject(item.id, {
-                techStack: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
-              })
-            }
-            className={INPUT}
+          <TagInput
+            tags={item.techStack ?? []}
+            onChange={(techStack) => updateProject(item.id, { techStack })}
+            placeholder="기술 스택 입력 후 Enter (예: React)"
           />
           <input
             type="url"
