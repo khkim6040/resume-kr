@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import type {
   ResumeData,
   Section,
+  TemplateId,
   WorkExperience,
   Education,
   Skill,
@@ -42,6 +43,8 @@ const defaultResumeData: ResumeData = {
 interface ResumeStore {
   data: ResumeData;
   dataVersion: number;
+  templateId: TemplateId;
+  setTemplateId: (id: TemplateId) => void;
   setData: (data: ResumeData) => void;
   updatePersonalInfo: (info: Partial<ResumeData["personalInfo"]>) => void;
   setSections: (sections: Section[]) => void;
@@ -129,6 +132,8 @@ export const useResumeStore = create<ResumeStore>()(
       return {
         data: defaultResumeData,
         dataVersion: 0,
+        templateId: "classic" as TemplateId,
+        setTemplateId: (id) => set({ templateId: id }),
         setData: (data) => vSet({ data }),
         updatePersonalInfo: (info) =>
           vSet((state) => ({
@@ -196,7 +201,7 @@ export const useResumeStore = create<ResumeStore>()(
     },
     {
       name: "resume-kr-storage",
-      partialize: (state) => ({ data: state.data }),
+      partialize: (state) => ({ data: state.data, templateId: state.templateId }),
     },
   ),
 );
