@@ -10,7 +10,21 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
     data = body.data as ResumeData;
-    if (body.templateId) templateId = body.templateId as TemplateId;
+    if (body.templateId !== undefined) {
+      if (
+        typeof body.templateId === "string" &&
+        (body.templateId === "classic" ||
+          body.templateId === "modern" ||
+          body.templateId === "minimal")
+      ) {
+        templateId = body.templateId;
+      } else {
+        return NextResponse.json(
+          { error: "Invalid templateId" },
+          { status: 400 },
+        );
+      }
+    }
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
