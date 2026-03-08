@@ -7,10 +7,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  const data = getData(id);
-  if (!data) {
+  const entry = getData(id);
+  if (!entry) {
     return NextResponse.json({ error: "Data not found or expired" }, { status: 404 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json({ data: entry.data, templateId: entry.templateId });
 }

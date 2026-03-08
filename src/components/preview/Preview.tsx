@@ -15,7 +15,7 @@ const FIT_LABELS: Record<number, string> = {
 };
 
 export default function Preview() {
-  const { data, dataVersion } = useResumeStore();
+  const { data, dataVersion, templateId } = useResumeStore();
   const { contentRef, fitLevel, styles: fs } = useAutoFit(dataVersion);
 
   return (
@@ -50,7 +50,7 @@ export default function Preview() {
           wordBreak: "keep-all",
         }}
       >
-        <A4Content data={data} fs={fs} contentRef={contentRef} />
+        <A4Content data={data} fs={fs} contentRef={contentRef} templateId={templateId} />
 
         {/* Page number */}
         <div

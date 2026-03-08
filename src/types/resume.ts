@@ -86,6 +86,8 @@ export interface Section {
   order: number;
 }
 
+export type TemplateId = "classic" | "modern" | "minimal";
+
 export interface ResumeData {
   personalInfo: PersonalInfo;
   workExperience: WorkExperience[];
