@@ -133,7 +133,7 @@ export const useResumeStore = create<ResumeStore>()(
         data: defaultResumeData,
         dataVersion: 0,
         templateId: "classic" as TemplateId,
-        setTemplateId: (id) => set({ templateId: id }),
+        setTemplateId: (id) => vSet({ templateId: id }),
         setData: (data) => vSet({ data }),
         updatePersonalInfo: (info) =>
           vSet((state) => ({
