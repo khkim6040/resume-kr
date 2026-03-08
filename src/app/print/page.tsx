@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/resume";
 import { A4Content } from "@/components/preview/A4Content";
 import { useAutoFit } from "@/hooks/useAutoFit";
-import type { ResumeData } from "@/types/resume";
+import type { ResumeData, TemplateId } from "@/types/resume";
 
 declare global {
   interface Window {
@@ -22,7 +22,7 @@ function PrintPageInner() {
   const id = searchParams.get("id");
   const [loaded, setLoaded] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const { data, dataVersion } = useResumeStore();
+  const { data, dataVersion, templateId } = useResumeStore();
   const { contentRef, styles: fs } = useAutoFit(dataVersion);
 
   useEffect(() => {
@@ -31,11 +31,12 @@ function PrintPageInner() {
     fetch(`/api/pdf/data?id=${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Data fetch failed");
-        return res.json() as Promise<ResumeData>;
+        return res.json() as Promise<{ data: ResumeData; templateId: TemplateId }>;
       })
-      .then((resumeData) => {
+      .then((result) => {
         useResumeStore.setState({
-          data: resumeData,
+          data: result.data,
+          templateId: result.templateId,
           dataVersion: Date.now(),
         });
         setLoaded(true);
@@ -67,7 +68,7 @@ function PrintPageInner() {
         background: "white",
       }}
     >
-      <A4Content data={data} fs={fs} contentRef={contentRef} />
+      <A4Content data={data} fs={fs} contentRef={contentRef} templateId={templateId} />
     </div>
   );
 }

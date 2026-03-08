@@ -5,6 +5,7 @@ import { useResumeStore } from "@/store/resume";
 
 export default function DownloadButton() {
   const data = useResumeStore((s) => s.data);
+  const templateId = useResumeStore((s) => s.templateId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +16,7 @@ export default function DownloadButton() {
       const res = await fetch("/api/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ data, templateId }),
       });
       if (!res.ok) {
         throw new Error(`PDF 생성 실패 (${res.status})`);

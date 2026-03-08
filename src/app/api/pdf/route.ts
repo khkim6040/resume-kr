@@ -1,19 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBrowser } from "@/lib/browser";
 import { saveData } from "@/lib/pdfDataStore";
-import type { ResumeData } from "@/types/resume";
+import type { ResumeData, TemplateId } from "@/types/resume";
 import { randomUUID } from "crypto";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let data: ResumeData;
+  let templateId: TemplateId = "classic";
   try {
-    data = (await req.json()) as ResumeData;
+    const body = await req.json();
+    data = body.data as ResumeData;
+    if (body.templateId) templateId = body.templateId as TemplateId;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
   const id = randomUUID();
-  saveData(id, data);
+  saveData(id, data, templateId);
 
   // 현재 서버의 origin 추출
   const origin = req.nextUrl.origin;
