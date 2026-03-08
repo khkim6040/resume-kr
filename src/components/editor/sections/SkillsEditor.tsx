@@ -2,6 +2,7 @@
 
 import { useResumeStore } from "@/store/resume";
 import type { Skill } from "@/types/resume";
+import TagInput from "../TagInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -29,16 +30,10 @@ export default function SkillsEditor() {
             onChange={(e) => updateSkill(item.id, { category: e.target.value })}
             className={INPUT}
           />
-          <input
-            type="text"
-            placeholder="기술 목록 (쉼표로 구분: React, TypeScript, Next.js)"
-            value={item.items.join(", ")}
-            onChange={(e) =>
-              updateSkill(item.id, {
-                items: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
-              })
-            }
-            className={INPUT}
+          <TagInput
+            tags={item.items}
+            onChange={(items) => updateSkill(item.id, { items })}
+            placeholder="기술 입력 후 Enter (예: React)"
           />
           <button
             onClick={() => removeSkill(item.id)}
