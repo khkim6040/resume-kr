@@ -8,32 +8,35 @@ const MIN_WIDTH = 300;
 const MAX_WIDTH = 600;
 
 export function useResizable() {
-  const [width, setWidth] = useState(() => {
-    if (typeof window === "undefined") return DEFAULT_WIDTH;
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const parsed = Number(stored);
-      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) {
-        return parsed;
-      }
-    }
-    return DEFAULT_WIDTH;
-  });
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
 
+  const widthRef = useRef(width);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(0);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      isDragging.current = true;
-      startX.current = e.clientX;
-      startWidth.current = width;
-      document.body.style.cursor = "col-resize";
-      document.body.style.userSelect = "none";
-    },
-    [width]
-  );
+  useEffect(() => {
+    widthRef.current = width;
+  }, [width]);
+
+  // localStorage에서 저장된 너비 복원 (hydration 이후)
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = Number(stored);
+      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) {
+        setWidth(parsed);
+      }
+    }
+  }, []);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    isDragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = widthRef.current;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, []);
 
   const handleDoubleClick = useCallback(() => {
     setWidth(DEFAULT_WIDTH);
@@ -56,7 +59,7 @@ export function useResizable() {
       isDragging.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
-      localStorage.setItem(STORAGE_KEY, String(width));
+      localStorage.setItem(STORAGE_KEY, String(widthRef.current));
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -65,7 +68,7 @@ export function useResizable() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [width]);
+  }, []);
 
   return { width, handleMouseDown, handleDoubleClick };
 }
