@@ -19,17 +19,14 @@ const SCALE = 2.8;
 
 function PrintPageInner() {
   const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { data, dataVersion } = useResumeStore();
   const { contentRef, styles: fs } = useAutoFit(dataVersion);
 
   useEffect(() => {
-    const id = searchParams.get("id");
-    if (!id) {
-      setError("Missing id parameter");
-      return;
-    }
+    if (!id) return;
 
     fetch(`/api/pdf/data?id=${id}`)
       .then((res) => {
@@ -43,8 +40,8 @@ function PrintPageInner() {
         });
         setLoaded(true);
       })
-      .catch((err) => setError((err as Error).message));
-  }, [searchParams]);
+      .catch((err) => setFetchError((err as Error).message));
+  }, [id]);
 
   // useAutoFit 안정화 후 ready 시그널
   useEffect(() => {
@@ -55,7 +52,8 @@ function PrintPageInner() {
     return () => clearTimeout(timer);
   }, [loaded]);
 
-  if (error) return <div>Error: {error}</div>;
+  if (!id) return <div>Error: Missing id parameter</div>;
+  if (fetchError) return <div>Error: {fetchError}</div>;
   if (!loaded) return <div>Loading...</div>;
 
   return (
