@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, KeyboardEvent } from "react";
+import { useState, useRef, KeyboardEvent, FocusEvent } from "react";
 
 interface TagInputProps {
   tags: string[];
@@ -11,6 +11,7 @@ interface TagInputProps {
 export default function TagInput({ tags, onChange, placeholder = "입력 후 Enter" }: TagInputProps) {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   function addTag() {
     const value = input.trim();
@@ -26,6 +27,7 @@ export default function TagInput({ tags, onChange, placeholder = "입력 후 Ent
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
+      if (e.nativeEvent.isComposing) return;
       e.preventDefault();
       addTag();
     } else if (e.key === "Backspace" && input === "" && tags.length > 0) {
@@ -33,14 +35,20 @@ export default function TagInput({ tags, onChange, placeholder = "입력 후 Ent
     }
   }
 
+  function handleBlur(e: FocusEvent<HTMLInputElement>) {
+    if (containerRef.current?.contains(e.relatedTarget as Node)) return;
+    addTag();
+  }
+
   return (
     <div
+      ref={containerRef}
       className="flex flex-wrap items-center gap-1.5 rounded-md border border-zinc-300 px-2 py-1.5 text-sm focus-within:border-zinc-500"
       onClick={() => inputRef.current?.focus()}
     >
       {tags.map((tag, i) => (
         <span
-          key={i}
+          key={tag}
           className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2 py-0.5 text-sm text-zinc-700"
         >
           {tag}
@@ -51,6 +59,8 @@ export default function TagInput({ tags, onChange, placeholder = "입력 후 Ent
               removeTag(i);
             }}
             className="text-zinc-400 hover:text-zinc-600"
+            aria-label="태그 삭제"
+            title="태그 삭제"
           >
             &times;
           </button>
@@ -62,7 +72,7 @@ export default function TagInput({ tags, onChange, placeholder = "입력 후 Ent
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={addTag}
+        onBlur={handleBlur}
         placeholder={tags.length === 0 ? placeholder : ""}
         className="min-w-[80px] flex-1 border-none bg-transparent py-0.5 text-sm outline-none"
       />
