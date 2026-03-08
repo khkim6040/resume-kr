@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useResumeStore } from "@/store/resume";
 import { A4Content } from "@/components/preview/A4Content";
@@ -17,7 +17,7 @@ const A4_WIDTH = 210;
 const A4_HEIGHT = 297;
 const SCALE = 2.8;
 
-export default function PrintPage() {
+function PrintPageInner() {
   const searchParams = useSearchParams();
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,5 +71,13 @@ export default function PrintPage() {
     >
       <A4Content data={data} fs={fs} contentRef={contentRef} />
     </div>
+  );
+}
+
+export default function PrintPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PrintPageInner />
+    </Suspense>
   );
 }
