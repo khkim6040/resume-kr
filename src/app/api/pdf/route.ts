@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBrowser } from "@/lib/browser";
 import { saveData } from "@/lib/pdfDataStore";
+import { A4_WIDTH_PX, A4_HEIGHT_PX } from "@/lib/pdfConstants";
 import type { ResumeData, TemplateId } from "@/types/resume";
 import { randomUUID } from "crypto";
 
@@ -30,13 +31,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const id = randomUUID();
-  saveData(id, data, templateId);
+  await saveData(id, data, templateId);
 
   // 현재 서버의 origin 추출
   const origin = req.nextUrl.origin;
 
   const browser = await getBrowser();
-  const page = await browser.newPage();
+  const page = await browser.newPage({
+    viewport: { width: A4_WIDTH_PX, height: A4_HEIGHT_PX },
+  });
 
   try {
     await page.goto(`${origin}/print?id=${id}`, {

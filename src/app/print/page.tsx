@@ -15,7 +15,9 @@ declare global {
 
 const A4_WIDTH = 210;
 const A4_HEIGHT = 297;
-const SCALE = 2.8;
+const SCALE = 2.8; // 미리보기와 동일한 콘텐츠 스케일
+const MM_TO_PX = 96 / 25.4; // 서버 상수와 동일 (클라이언트 컴포넌트라 직접 정의)
+const TRANSFORM_RATIO = MM_TO_PX / SCALE; // ~1.35
 
 function PrintPageInner() {
   const searchParams = useSearchParams();
@@ -60,15 +62,24 @@ function PrintPageInner() {
   return (
     <div
       style={{
-        width: A4_WIDTH * SCALE,
-        height: A4_HEIGHT * SCALE,
+        width: A4_WIDTH * MM_TO_PX,
+        height: A4_HEIGHT * MM_TO_PX,
         overflow: "hidden",
-        fontFamily: "Pretendard, sans-serif",
-        wordBreak: "keep-all",
         background: "white",
       }}
     >
-      <A4Content data={data} fs={fs} contentRef={contentRef} templateId={templateId} />
+      <div
+        style={{
+          width: A4_WIDTH * SCALE,
+          height: A4_HEIGHT * SCALE,
+          transform: `scale(${TRANSFORM_RATIO})`,
+          transformOrigin: "top left",
+          fontFamily: "Pretendard, sans-serif",
+          wordBreak: "keep-all",
+        }}
+      >
+        <A4Content data={data} fs={fs} contentRef={contentRef} templateId={templateId} />
+      </div>
     </div>
   );
 }
