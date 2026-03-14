@@ -69,5 +69,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: message }, { status: 500 });
   } finally {
     await page.close();
+    await browser.close();
   }
 }
