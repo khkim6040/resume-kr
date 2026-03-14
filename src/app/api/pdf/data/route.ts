@@ -7,7 +7,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Missing id" }, { status: 400 });
   }
 
-  const entry = getData(id);
+  const entry = await getData(id);
   if (!entry) {
     return NextResponse.json({ error: "Data not found or expired" }, { status: 404 });
   }
