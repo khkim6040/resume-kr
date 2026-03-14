@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useResumeStore } from "@/store/resume";
+import html2canvas from "html2canvas-pro";
+import { jsPDF } from "jspdf";
+
+const A4_WIDTH_MM = 210;
+const A4_HEIGHT_MM = 297;
 
 export default function DownloadButton() {
-  const data = useResumeStore((s) => s.data);
-  const templateId = useResumeStore((s) => s.templateId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,23 +15,19 @@ export default function DownloadButton() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data, templateId }),
+      const target = document.querySelector("[data-pdf-target]") as HTMLElement | null;
+      if (!target) throw new Error("미리보기 영역을 찾을 수 없습니다");
+
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
       });
-      if (!res.ok) {
-        throw new Error(`PDF 생성 실패 (${res.status})`);
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resume.pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const imgData = canvas.toDataURL("image/png");
+      pdf.addImage(imgData, "PNG", 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+      pdf.save("resume.pdf");
     } catch (err) {
       setError(err instanceof Error ? err.message : "알 수 없는 오류");
     } finally {

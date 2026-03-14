@@ -41,6 +41,7 @@ export default function Preview() {
 
       {/* A4 Page */}
       <div
+        data-pdf-target
         className="relative bg-white shadow-lg"
         style={{
           width: A4_WIDTH * SCALE,
