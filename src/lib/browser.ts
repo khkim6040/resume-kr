@@ -1,11 +1,15 @@
-import { chromium, type Browser } from "playwright";
+import { chromium, type Browser } from "playwright-core";
+import chromiumBinary from "@sparticuz/chromium";
 
 let browserInstance: Browser | null = null;
 
 export async function getBrowser(): Promise<Browser> {
   if (!browserInstance || !browserInstance.isConnected()) {
+    const executablePath = await chromiumBinary.executablePath();
     browserInstance = await chromium.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: chromiumBinary.args,
+      executablePath,
+      headless: true,
     });
   }
   return browserInstance;
