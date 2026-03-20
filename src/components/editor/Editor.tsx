@@ -25,7 +25,7 @@ import CertificatesEditor from "./sections/CertificatesEditor";
 import LanguagesEditor from "./sections/LanguagesEditor";
 import AwardsEditor from "./sections/AwardsEditor";
 import DownloadButton from "./DownloadButton";
-import TemplateSelector from "./TemplateSelector";
+
 
 const INPUT =
   "w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm transition-colors focus:border-zinc-400 focus:bg-white focus:outline-none";
@@ -330,11 +330,6 @@ export default function Editor() {
           </p>
         </div>
         <DownloadButton />
-      </div>
-
-      {/* Template selector */}
-      <div className="border-b border-zinc-200 px-4 py-3">
-        <TemplateSelector />
       </div>
 
       {/* Sections */}
