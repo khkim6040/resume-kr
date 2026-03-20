@@ -2,7 +2,12 @@ import { Font } from "@react-pdf/renderer";
 
 const BASE = "/fonts";
 
+let registered = false;
+
 export function registerFonts() {
+  if (registered) return;
+  registered = true;
+
   Font.register({
     family: "Pretendard",
     fonts: [
