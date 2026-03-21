@@ -28,6 +28,7 @@ export interface Education {
   endDate?: string;
   isCurrent: boolean;
   description?: string;
+  minors?: { degree: string; field: string }[];
 }
 
 export interface Skill {

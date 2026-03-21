@@ -73,7 +73,7 @@ function PersonalInfoEditor() {
         onChange={(e) => updatePersonalInfo({ name: e.target.value })}
         className={INPUT}
       />
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5 min-w-0">
         <input
           type="email"
           placeholder="이메일"
@@ -96,7 +96,7 @@ function PersonalInfoEditor() {
         onChange={(e) => updatePersonalInfo({ address: e.target.value })}
         className={INPUT}
       />
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-2 gap-2.5 min-w-0">
         <input
           type="url"
           placeholder="LinkedIn (선택)"
@@ -268,16 +268,9 @@ function SortableSection({
       </div>
 
       {/* Section content - accordion */}
-      {isExpanded && section.visible && (
+      {isExpanded && (
         <div className="border-t border-zinc-100 px-3 pb-3 pt-3">
           {sectionContent(section.type)}
-        </div>
-      )}
-
-      {/* Collapsed summary when visible but not expanded */}
-      {!isExpanded && !section.visible && (
-        <div className="border-t border-zinc-100 px-3 py-2">
-          <span className="text-xs text-zinc-400">숨김 상태</span>
         </div>
       )}
     </div>
@@ -333,7 +326,7 @@ export default function Editor() {
       </div>
 
       {/* Sections */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
