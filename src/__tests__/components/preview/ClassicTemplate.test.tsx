@@ -179,6 +179,55 @@ describe("ClassicTemplate", () => {
       expect(screen.getByText("React")).toBeInTheDocument();
       expect(screen.getByText("Next.js")).toBeInTheDocument();
     });
+
+    it("유효한 링크가 있으면 링크 아이콘을 표시한다", () => {
+      renderTemplate(makeData({
+        sections: [
+          { id: "sec-projects", type: "projects", title: "프로젝트", visible: true, order: 0 },
+        ],
+        projects: [{
+          id: "p1",
+          name: "이력서 빌더",
+          startDate: "2024-01",
+          description: [],
+          link: "https://github.com/user/repo",
+        }],
+      }));
+      const link = screen.getByLabelText("프로젝트 링크");
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute("href", "https://github.com/user/repo");
+    });
+
+    it("링크가 없으면 링크 아이콘을 표시하지 않는다", () => {
+      renderTemplate(makeData({
+        sections: [
+          { id: "sec-projects", type: "projects", title: "프로젝트", visible: true, order: 0 },
+        ],
+        projects: [{
+          id: "p1",
+          name: "이력서 빌더",
+          startDate: "2024-01",
+          description: [],
+        }],
+      }));
+      expect(screen.queryByLabelText("프로젝트 링크")).not.toBeInTheDocument();
+    });
+
+    it("javascript: 스킴 링크는 렌더링하지 않는다", () => {
+      renderTemplate(makeData({
+        sections: [
+          { id: "sec-projects", type: "projects", title: "프로젝트", visible: true, order: 0 },
+        ],
+        projects: [{
+          id: "p1",
+          name: "이력서 빌더",
+          startDate: "2024-01",
+          description: [],
+          link: "javascript:alert(1)",
+        }],
+      }));
+      expect(screen.queryByLabelText("프로젝트 링크")).not.toBeInTheDocument();
+    });
   });
 
   describe("자격증 섹션", () => {
