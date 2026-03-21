@@ -78,6 +78,14 @@ interface ResumeStore {
   addAward: (item: Award) => void;
   updateAward: (id: string, item: Partial<Award>) => void;
   removeAward: (id: string) => void;
+
+  reorderWorkExperience: (fromIndex: number, toIndex: number) => void;
+  reorderEducation: (fromIndex: number, toIndex: number) => void;
+  reorderSkills: (fromIndex: number, toIndex: number) => void;
+  reorderProjects: (fromIndex: number, toIndex: number) => void;
+  reorderCertificates: (fromIndex: number, toIndex: number) => void;
+  reorderLanguages: (fromIndex: number, toIndex: number) => void;
+  reorderAwards: (fromIndex: number, toIndex: number) => void;
 }
 
 function makeArrayActions<T extends { id: string }>(
@@ -108,6 +116,13 @@ function makeArrayActions<T extends { id: string }>(
           [key]: (state.data[key] as unknown as T[]).filter((item) => item.id !== id),
         },
       })),
+    reorder: (fromIndex: number, toIndex: number) =>
+      set((state) => {
+        const items = [...(state.data[key] as unknown as T[])];
+        const [moved] = items.splice(fromIndex, 1);
+        items.splice(toIndex, 0, moved);
+        return { data: { ...state.data, [key]: items } };
+      }),
   };
 }
 
@@ -197,16 +212,43 @@ export const useResumeStore = create<ResumeStore>()(
         addAward: award.add,
         updateAward: award.update,
         removeAward: award.remove,
+
+        reorderWorkExperience: work.reorder,
+        reorderEducation: edu.reorder,
+        reorderSkills: skill.reorder,
+        reorderProjects: project.reorder,
+        reorderCertificates: cert.reorder,
+        reorderLanguages: lang.reorder,
+        reorderAwards: award.reorder,
       };
     },
     {
       name: "resume-kr-storage",
-      version: 1,
+      version: 2,
       partialize: (state) => ({ data: state.data, templateId: state.templateId }),
       migrate: (persisted: unknown) => {
         const state = persisted as Record<string, unknown>;
         if (state.templateId !== "classic") {
           state.templateId = "classic";
+        }
+        // Migrate date format from YYYY.MM to YYYY-MM for type="month" inputs
+        const data = state.data as Record<string, unknown> | undefined;
+        if (data) {
+          const migrateDate = (d: string | undefined) => d?.replace(/\./g, '-');
+          const migrateItems = (items: Array<Record<string, unknown>> | undefined, fields: string[]) => {
+            items?.forEach(item => {
+              fields.forEach(f => {
+                if (typeof item[f] === 'string') {
+                  item[f] = migrateDate(item[f] as string);
+                }
+              });
+            });
+          };
+          migrateItems(data.workExperience as Array<Record<string, unknown>>, ['startDate', 'endDate']);
+          migrateItems(data.education as Array<Record<string, unknown>>, ['startDate', 'endDate']);
+          migrateItems(data.projects as Array<Record<string, unknown>>, ['startDate', 'endDate']);
+          migrateItems(data.certificates as Array<Record<string, unknown>>, ['date']);
+          migrateItems(data.awards as Array<Record<string, unknown>>, ['date']);
         }
         return state;
       },
