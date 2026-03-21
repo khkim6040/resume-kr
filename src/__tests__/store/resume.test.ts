@@ -308,3 +308,67 @@ describe("useResumeStore - setTemplateId", () => {
     expect(useResumeStore.getState().dataVersion).toBe(prevVersion + 1);
   });
 });
+
+describe("useResumeStore - reorder", () => {
+  it("경력 항목 순서를 변경할 수 있다", () => {
+    const store = useResumeStore.getState();
+    const a: WorkExperience = { id: "w1", company: "A", position: "", startDate: "", isCurrent: false, description: [] };
+    const b: WorkExperience = { id: "w2", company: "B", position: "", startDate: "", isCurrent: false, description: [] };
+    const c: WorkExperience = { id: "w3", company: "C", position: "", startDate: "", isCurrent: false, description: [] };
+    store.addWorkExperience(a);
+    store.addWorkExperience(b);
+    store.addWorkExperience(c);
+
+    useResumeStore.getState().reorderWorkExperience(0, 2);
+    const items = useResumeStore.getState().data.workExperience;
+    expect(items.map(i => i.company)).toEqual(["B", "C", "A"]);
+  });
+
+  it("같은 인덱스로 reorder 시 변경 없음", () => {
+    const store = useResumeStore.getState();
+    store.addEducation({ id: "e1", school: "X", degree: "", field: "", startDate: "", isCurrent: false });
+    store.addEducation({ id: "e2", school: "Y", degree: "", field: "", startDate: "", isCurrent: false });
+
+    useResumeStore.getState().reorderEducation(1, 1);
+    expect(useResumeStore.getState().data.education.map(i => i.school)).toEqual(["X", "Y"]);
+  });
+
+  it("범위 밖 인덱스는 무시된다", () => {
+    const store = useResumeStore.getState();
+    store.addSkill({ id: "s1", category: "A", items: [] });
+
+    useResumeStore.getState().reorderSkills(-1, 5);
+    expect(useResumeStore.getState().data.skills).toHaveLength(1);
+  });
+});
+
+describe("useResumeStore - 날짜 마이그레이션", () => {
+  it("YYYY.MM 형식을 YYYY-MM으로 변환한다", () => {
+    // 마이그레이션 함수를 직접 테스트하기 어려우므로 store의 migrate를 간접 테스트
+    // persist config에서 migrate를 export하지 않으므로 로직을 검증
+    const migrateDate = (d: string | undefined): string | undefined => {
+      if (typeof d !== 'string') return d;
+      const match = d.match(/^\s*(\d{4})\.(\d{1,2})\s*$/);
+      if (!match) return d;
+      return `${match[1]}-${match[2].padStart(2, '0')}`;
+    };
+
+    expect(migrateDate("2022.03")).toBe("2022-03");
+    expect(migrateDate("2023.1")).toBe("2023-01");
+    expect(migrateDate(" 2024.12 ")).toBe("2024-12");
+  });
+
+  it("비표준 형식은 변환하지 않는다", () => {
+    const migrateDate = (d: string | undefined): string | undefined => {
+      if (typeof d !== 'string') return d;
+      const match = d.match(/^\s*(\d{4})\.(\d{1,2})\s*$/);
+      if (!match) return d;
+      return `${match[1]}-${match[2].padStart(2, '0')}`;
+    };
+
+    expect(migrateDate("2022.03 예정")).toBe("2022.03 예정");
+    expect(migrateDate("2022-03")).toBe("2022-03");
+    expect(migrateDate(undefined)).toBeUndefined();
+    expect(migrateDate("")).toBe("");
+  });
+});

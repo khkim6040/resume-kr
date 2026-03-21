@@ -156,7 +156,7 @@ function EducationSection({ items }: { items: Education[] }) {
             </Text>
             <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent} />
           </View>
-          {item.minors && item.minors.length > 0 && item.minors.map((minor, idx) => (
+          {item.minors?.filter(m => m.degree || m.field).map((minor, idx) => (
             <Text key={idx} style={st.desc}>
               {[minor.degree, minor.field].filter(Boolean).join(" ")}
             </Text>

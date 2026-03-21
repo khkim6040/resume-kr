@@ -122,7 +122,7 @@ function EducationSection({
               fs={fs}
             />
           </div>
-          {item.minors && item.minors.length > 0 && item.minors.map((minor, idx) => (
+          {item.minors?.filter(m => m.degree || m.field).map((minor, idx) => (
             <div key={idx} className="text-zinc-600" style={{ fontSize: fs.fontSize - 2 }}>
               {[minor.degree, minor.field].filter(Boolean).join(" ")}
             </div>
