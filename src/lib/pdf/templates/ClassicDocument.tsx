@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "@react-pdf/renderer";
+import { View, Text, Link, StyleSheet } from "@react-pdf/renderer";
 import type {
   ResumeData,
   SectionType,
@@ -12,6 +12,7 @@ import type {
 } from "@/types/resume";
 import { COLORS, SIZES } from "../tokens";
 import { formatDate } from "../utils";
+import { sanitizeUrl } from "../../sanitizeUrl";
 
 const c = COLORS.classic;
 const s = SIZES;
@@ -114,26 +115,29 @@ function DateRange({ startDate, endDate, isCurrent }: { startDate: string; endDa
 function WorkExperienceSection({ items }: { items: WorkExperience[] }) {
   return (
     <View style={{ gap: s.itemGap }}>
-      {items.map((item) => (
-        <View key={item.id}>
-          <View style={st.itemRow}>
-            <Text style={st.itemTitle}>
-              {item.company}
-              {item.position ? <Text style={st.itemSub}> | {item.position}</Text> : null}
-            </Text>
-            <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent} />
-          </View>
-          {item.description.length > 0 && (
-            <View style={st.bulletList}>
-              {item.description.map((line, i) => (
-                <Text key={i} style={st.bulletItem}>
-                  {"•  "}{line}
-                </Text>
-              ))}
+      {items.map((item) => {
+        const lines = item.description.filter(line => line.trim());
+        return (
+          <View key={item.id} wrap={false}>
+            <View style={st.itemRow}>
+              <Text style={st.itemTitle}>
+                {item.company}
+                {item.position ? <Text style={st.itemSub}> | {item.position}</Text> : null}
+              </Text>
+              <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent} />
             </View>
-          )}
-        </View>
-      ))}
+            {lines.length > 0 && (
+              <View style={st.bulletList}>
+                {lines.map((line, i) => (
+                  <Text key={i} style={st.bulletItem}>
+                    {"•  "}{line}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -142,7 +146,7 @@ function EducationSection({ items }: { items: Education[] }) {
   return (
     <View style={{ gap: s.itemGap - 4 }}>
       {items.map((item) => (
-        <View key={item.id}>
+        <View key={item.id} wrap={false}>
           <View style={st.itemRow}>
             <Text style={st.itemTitle}>
               {item.school}
@@ -152,6 +156,11 @@ function EducationSection({ items }: { items: Education[] }) {
             </Text>
             <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent} />
           </View>
+          {item.minors && item.minors.length > 0 && item.minors.map((minor, idx) => (
+            <Text key={idx} style={st.desc}>
+              {[minor.degree, minor.field].filter(Boolean).join(" ")}
+            </Text>
+          ))}
           {item.description ? <Text style={st.desc}>{item.description}</Text> : null}
         </View>
       ))}
@@ -175,33 +184,36 @@ function SkillsSection({ items }: { items: Skill[] }) {
 function ProjectsSection({ items }: { items: Project[] }) {
   return (
     <View style={{ gap: s.itemGap }}>
-      {items.map((item) => (
-        <View key={item.id}>
-          <View style={st.itemRow}>
-            <Text style={st.itemTitle}>
-              {item.name}
-              {item.role ? <Text style={st.itemSub}> ({item.role})</Text> : null}
-            </Text>
-            <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={false} />
+      {items.map((item) => {
+        const lines = item.description.filter(line => line.trim());
+        return (
+          <View key={item.id} wrap={false}>
+            <View style={st.itemRow}>
+              <Text style={st.itemTitle}>
+                {item.name}
+                {item.role ? <Text style={st.itemSub}> ({item.role})</Text> : null}
+              </Text>
+              <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={false} />
+            </View>
+            {lines.length > 0 && (
+              <View style={st.bulletList}>
+                {lines.map((line, i) => (
+                  <Text key={i} style={st.bulletItem}>
+                    {"•  "}{line}
+                  </Text>
+                ))}
+              </View>
+            )}
+            {item.techStack && item.techStack.length > 0 && (
+              <View style={st.pillRow}>
+                {item.techStack.map((tech) => (
+                  <Text key={tech} style={st.pill}>{tech}</Text>
+                ))}
+              </View>
+            )}
           </View>
-          {item.description.length > 0 && (
-            <View style={st.bulletList}>
-              {item.description.map((line, i) => (
-                <Text key={i} style={st.bulletItem}>
-                  {"•  "}{line}
-                </Text>
-              ))}
-            </View>
-          )}
-          {item.techStack && item.techStack.length > 0 && (
-            <View style={st.pillRow}>
-              {item.techStack.map((tech) => (
-                <Text key={tech} style={st.pill}>{tech}</Text>
-              ))}
-            </View>
-          )}
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }
@@ -239,7 +251,7 @@ function AwardsSection({ items }: { items: Award[] }) {
   return (
     <View style={{ gap: s.itemGap - 4 }}>
       {items.map((item) => (
-        <View key={item.id}>
+        <View key={item.id} wrap={false}>
           <View style={st.simpleRow}>
             <Text>
               <Text style={st.simpleLabel}>{item.name}</Text>
@@ -273,6 +285,10 @@ export function ClassicDocument({ data }: { data: ResumeData }) {
     .filter((sec) => sec.visible && sec.type !== "personalInfo")
     .sort((a, b) => a.order - b.order);
 
+  const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
+  const safeGithub = personalInfo.github ? sanitizeUrl(personalInfo.github) : undefined;
+  const safeWebsite = personalInfo.website ? sanitizeUrl(personalInfo.website) : undefined;
+
   return (
     <View style={st.container}>
       {/* Header */}
@@ -282,9 +298,9 @@ export function ClassicDocument({ data }: { data: ResumeData }) {
           {personalInfo.email ? <Text>{personalInfo.email}</Text> : null}
           {personalInfo.phone ? <Text>{personalInfo.phone}</Text> : null}
           {personalInfo.address ? <Text>{personalInfo.address}</Text> : null}
-          {personalInfo.linkedin ? <Text>{personalInfo.linkedin}</Text> : null}
-          {personalInfo.github ? <Text>{personalInfo.github}</Text> : null}
-          {personalInfo.website ? <Text>{personalInfo.website}</Text> : null}
+          {safeLinkedin ? <Link src={safeLinkedin} style={{color: c.secondary, textDecoration: 'none', fontSize: s.smallFont}}><Text>LinkedIn</Text></Link> : null}
+          {safeGithub ? <Link src={safeGithub} style={{color: c.secondary, textDecoration: 'none', fontSize: s.smallFont}}><Text>GitHub</Text></Link> : null}
+          {safeWebsite ? <Link src={safeWebsite} style={{color: c.secondary, textDecoration: 'none', fontSize: s.smallFont}}><Text>{safeWebsite.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</Text></Link> : null}
         </View>
         {personalInfo.summary ? (
           <Text style={st.summary}>{personalInfo.summary}</Text>

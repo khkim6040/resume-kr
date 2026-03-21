@@ -25,7 +25,12 @@ const FIT_PRESETS: Record<FitLevel, FitStyles> = {
 export function useAutoFit(dataVersion: number) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [fitLevel, setFitLevel] = useState<FitLevel>(0);
-  const iterationRef = useRef(0);
+  const lastDirectionRef = useRef<'up' | 'down' | null>(null);
+
+  // Reset direction when dataVersion changes
+  useEffect(() => {
+    lastDirectionRef.current = null;
+  }, [dataVersion]);
 
   const measure = useCallback(() => {
     const el = contentRef.current;
@@ -36,20 +41,23 @@ export function useAutoFit(dataVersion: number) {
     const contentHeight = el.scrollHeight;
 
     if (contentHeight > availableHeight && fitLevel < 3) {
-      if (iterationRef.current < 4) {
-        iterationRef.current++;
-        setFitLevel((prev) => Math.min(prev + 1, 3) as FitLevel);
+      // Content overflows — increase fit level
+      setFitLevel((prev) => Math.min(prev + 1, 3) as FitLevel);
+      lastDirectionRef.current = 'up';
+    } else if (fitLevel > 0 && lastDirectionRef.current !== 'up') {
+      // Check if we can decrease fit level (content might fit with less shrinking)
+      const prevLevel = (fitLevel - 1) as FitLevel;
+      const prevPadding = FIT_PRESETS[prevLevel].padding;
+      const prevAvailable = A4_HEIGHT_PX - prevPadding * 2;
+      // Use a margin to prevent oscillation (content must be significantly smaller)
+      if (contentHeight < prevAvailable * 0.92) {
+        setFitLevel(prevLevel);
+        lastDirectionRef.current = 'down';
       }
     }
   }, [fitLevel]);
 
-  // Reset when data changes
-  useEffect(() => {
-    iterationRef.current = 0;
-    setFitLevel(0);
-  }, [dataVersion]);
-
-  // Measure after render with RAF
+  // Measure after render with RAF — no reset on dataVersion change
   useEffect(() => {
     const id = requestAnimationFrame(() => {
       measure();
