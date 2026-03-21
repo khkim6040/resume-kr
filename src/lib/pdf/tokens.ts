@@ -22,4 +22,7 @@ export const SIZES = {
   itemGap: 10,
   padding: 30,
   headerMarginBottom: 16,
+  contactGap: 10,
+  summaryMarginTop: 8,
+  skillCategoryWidth: 75,
 } as const;

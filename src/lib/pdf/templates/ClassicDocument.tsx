@@ -13,6 +13,7 @@ import type {
 import { COLORS, SIZES } from "../tokens";
 import { formatDate } from "../utils";
 import { sanitizeUrl } from "../../sanitizeUrl";
+import { sectionHasContent } from "../../sectionHasContent";
 
 const c = COLORS.classic;
 const s = SIZES;
@@ -88,13 +89,13 @@ const st = StyleSheet.create({
   contactRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: s.contactGap,
     marginTop: 4,
     fontSize: s.smallFont,
     color: c.secondary,
   },
   summary: {
-    marginTop: 6,
+    marginTop: s.summaryMarginTop,
     fontSize: s.smallFont,
     color: c.body,
     lineHeight: s.lineHeight,
@@ -139,7 +140,7 @@ const st = StyleSheet.create({
     fontSize: s.smallFont,
     marginBottom: 2,
   },
-  skillCategory: { width: 80, fontWeight: 500, color: c.body, flexShrink: 0 },
+  skillCategory: { width: s.skillCategoryWidth, fontWeight: 500, color: c.body, flexShrink: 0 },
   skillItems: { color: c.secondary, flex: 1 },
   // pills
   pillRow: { flexDirection: "row", flexWrap: "wrap", gap: 3, marginTop: 3 },
@@ -343,7 +344,7 @@ function SectionContent({ type, data }: { type: SectionType; data: ResumeData })
 export function ClassicDocument({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data;
   const visibleSections = sections
-    .filter((sec) => sec.visible && sec.type !== "personalInfo")
+    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data))
     .sort((a, b) => a.order - b.order);
 
   const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
