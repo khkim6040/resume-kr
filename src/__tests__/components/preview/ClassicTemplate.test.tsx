@@ -85,17 +85,27 @@ describe("ClassicTemplate", () => {
   });
 
   describe("섹션 가시성", () => {
-    it("visible이 true인 섹션만 렌더링한다", () => {
-      renderTemplate(makeData());
+    it("visible이 true이고 항목이 있는 섹션만 렌더링한다", () => {
+      renderTemplate(makeData({
+        workExperience: [{ id: "w1", company: "테스트", position: "", startDate: "", isCurrent: false, description: [] }],
+        education: [{ id: "e1", school: "테스트대", degree: "", field: "", startDate: "", isCurrent: false }],
+      }));
       expect(screen.getByText("경력")).toBeInTheDocument();
       expect(screen.getByText("학력")).toBeInTheDocument();
       expect(screen.queryByText("자격증")).not.toBeInTheDocument();
       expect(screen.queryByText("어학")).not.toBeInTheDocument();
     });
 
-    it("personalInfo 섹션은 섹션 목록에 나타나지 않는다", () => {
+    it("항목이 없는 visible 섹션은 렌더링하지 않는다", () => {
       renderTemplate(makeData());
-      // personalInfo는 헤더로 렌더링되므로 섹션 제목에 "인적사항"이 없어야 함
+      expect(screen.queryByText("경력")).not.toBeInTheDocument();
+      expect(screen.queryByText("학력")).not.toBeInTheDocument();
+    });
+
+    it("personalInfo 섹션은 섹션 목록에 나타나지 않는다", () => {
+      renderTemplate(makeData({
+        workExperience: [{ id: "w1", company: "테스트", position: "", startDate: "", isCurrent: false, description: [] }],
+      }));
       const headings = screen.getAllByRole("heading", { level: 2 });
       const headingTexts = headings.map((h) => h.textContent);
       expect(headingTexts).not.toContain("인적사항");
@@ -120,9 +130,9 @@ describe("ClassicTemplate", () => {
       expect(screen.getByText("성능 최적화")).toBeInTheDocument();
     });
 
-    it("빈 경력은 placeholder를 표시한다", () => {
+    it("빈 경력 섹션은 미리보기에서 숨겨진다", () => {
       renderTemplate(makeData());
-      expect(screen.getAllByText("항목을 추가하세요").length).toBeGreaterThan(0);
+      expect(screen.queryByText("경력")).not.toBeInTheDocument();
     });
   });
 
@@ -288,6 +298,8 @@ describe("ClassicTemplate", () => {
           { id: "sec-skills", type: "skills", title: "기술", visible: true, order: 0 },
           { id: "sec-work", type: "workExperience", title: "경력", visible: true, order: 1 },
         ],
+        skills: [{ id: "s1", category: "Frontend", items: ["React"] }],
+        workExperience: [{ id: "w1", company: "테스트", position: "", startDate: "", isCurrent: false, description: [] }],
       }));
       const headings = screen.getAllByRole("heading", { level: 2 });
       expect(headings[0].textContent).toBe("기술");
