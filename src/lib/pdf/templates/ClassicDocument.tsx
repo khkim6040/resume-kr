@@ -1,4 +1,4 @@
-import { View, Text, Link, StyleSheet, Svg, Path, Circle, Line, G } from "@react-pdf/renderer";
+import { View, Text, Link, StyleSheet, Svg, Path, Circle, Line } from "@react-pdf/renderer";
 import type {
   ResumeData,
   SectionType,
@@ -247,12 +247,12 @@ function ProjectsSection({ items }: { items: Project[] }) {
         return (
           <View key={item.id}>
             <View style={st.itemRow} wrap={false}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}>
                 <Text style={st.itemTitle}>
                   {item.name}
                   {item.role ? <Text style={st.itemSub}> ({item.role})</Text> : null}
                 </Text>
-                {item.link ? <Link src={sanitizeUrl(item.link)} style={{textDecoration: 'none'}}><LinkIcon /></Link> : null}
+                {(() => { const safeLink = item.link ? sanitizeUrl(item.link) : undefined; return safeLink ? <Link src={safeLink} style={{textDecoration: 'none'}}><LinkIcon /></Link> : null; })()}
               </View>
               <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={false} />
             </View>
