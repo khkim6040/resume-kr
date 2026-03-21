@@ -13,6 +13,7 @@ import type {
 import { COLORS, SIZES } from "../tokens";
 import { formatDate } from "../utils";
 import { sanitizeUrl } from "../../sanitizeUrl";
+import { sectionHasContent } from "../../sectionHasContent";
 
 const c = COLORS.classic;
 const s = SIZES;
@@ -343,7 +344,7 @@ function SectionContent({ type, data }: { type: SectionType; data: ResumeData })
 export function ClassicDocument({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data;
   const visibleSections = sections
-    .filter((sec) => sec.visible && sec.type !== "personalInfo")
+    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data))
     .sort((a, b) => a.order - b.order);
 
   const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
