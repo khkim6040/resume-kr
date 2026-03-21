@@ -18,11 +18,13 @@ describe("SortableList", () => {
   });
 
   it("아이템이 없으면 빈 상태를 렌더링한다", () => {
-    const { container } = render(
+    render(
       <SortableList items={[]} onReorder={vi.fn()}>
-        {(item: { id: string }) => <div>{item.id}</div>}
+        {(item: { id: string }) => (
+          <div data-testid="sortable-item">{item.id}</div>
+        )}
       </SortableList>
     );
-    expect(container.querySelectorAll("[data-testid]")).toHaveLength(0);
+    expect(screen.queryByTestId("sortable-item")).not.toBeInTheDocument();
   });
 });
