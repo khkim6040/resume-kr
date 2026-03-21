@@ -201,7 +201,15 @@ export const useResumeStore = create<ResumeStore>()(
     },
     {
       name: "resume-kr-storage",
+      version: 1,
       partialize: (state) => ({ data: state.data, templateId: state.templateId }),
+      migrate: (persisted: unknown) => {
+        const state = persisted as Record<string, unknown>;
+        if (state.templateId !== "classic") {
+          state.templateId = "classic";
+        }
+        return state;
+      },
     },
   ),
 );
