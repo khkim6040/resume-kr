@@ -82,6 +82,7 @@ export default function ProjectsEditor() {
                   <input
                     type="month"
                     value={item.endDate ?? ""}
+                    min={item.startDate || undefined}
                     onChange={(e) => updateProject(item.id, { endDate: e.target.value })}
                     className={`${INPUT} flex-1`}
                   />

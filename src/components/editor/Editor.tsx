@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   PointerSensor,
@@ -281,6 +281,10 @@ export default function Editor() {
   const { data, reorderSections } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
+  // Prevent hydration mismatch from @dnd-kit aria-describedby IDs
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   // Accordion state: first section expanded by default
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
     () => new Set([sorted[0]?.id]),
@@ -327,15 +331,8 @@ export default function Editor() {
 
       {/* Sections */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={sorted.map((s) => s.id)}
-            strategy={verticalListSortingStrategy}
-          >
+        {(() => {
+          const sectionList = (
             <div className="flex flex-col gap-3">
               {sorted.map((section) => (
                 <SortableSection
@@ -346,8 +343,22 @@ export default function Editor() {
                 />
               ))}
             </div>
-          </SortableContext>
-        </DndContext>
+          );
+          return isMounted ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sorted.map((s) => s.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {sectionList}
+              </SortableContext>
+            </DndContext>
+          ) : sectionList;
+        })()}
       </div>
     </div>
   );

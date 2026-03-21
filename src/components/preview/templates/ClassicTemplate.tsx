@@ -37,7 +37,8 @@ function DateRange({
   );
 }
 
-function Placeholder() {
+function Placeholder({ isPreview = true }: { isPreview?: boolean }) {
+  if (isPreview) return null;
   return <p className="text-sm text-zinc-400">항목을 추가하세요</p>;
 }
 
@@ -48,10 +49,11 @@ function WorkExperienceSection({
   items: WorkExperience[];
   fs: FitStyles;
 }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.company.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: fs.itemGap }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
             <span style={{ fontSize: fs.fontSize }} className="font-medium">
@@ -101,10 +103,11 @@ function EducationSection({
   items: Education[];
   fs: FitStyles;
 }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.school.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: fs.itemGap - 4 }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
             <span style={{ fontSize: fs.fontSize }} className="font-medium">
@@ -145,10 +148,11 @@ function EducationSection({
 }
 
 function SkillsSection({ items, fs }: { items: Skill[]; fs: FitStyles }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.category.trim() || item.items.length > 0);
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: Math.max(fs.itemGap - 10, 4) }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div
           key={item.id}
           className="flex"
@@ -171,10 +175,11 @@ function ProjectsSection({
   items: Project[];
   fs: FitStyles;
 }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.name.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: fs.itemGap }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
             <span className="flex items-center gap-1">
@@ -244,10 +249,11 @@ function CertificatesSection({
   items: Certificate[];
   fs: FitStyles;
 }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.name.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: Math.max(fs.itemGap - 10, 4) }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id} className="flex items-baseline justify-between">
           <span style={{ fontSize: fs.fontSize - 2 }}>
             <span className="font-medium">{item.name}</span>
@@ -274,10 +280,11 @@ function LanguagesSection({
   items: Language[];
   fs: FitStyles;
 }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.name.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: Math.max(fs.itemGap - 10, 4) }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id} style={{ fontSize: fs.fontSize - 2 }}>
           <span className="font-medium">{item.name}</span>
           {item.level && (
@@ -290,10 +297,11 @@ function LanguagesSection({
 }
 
 function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
-  if (items.length === 0) return <Placeholder />;
+  const filtered = items.filter((item) => item.name.trim());
+  if (filtered.length === 0) return <Placeholder />;
   return (
     <div className="flex flex-col" style={{ gap: fs.itemGap - 4 }}>
-      {items.map((item) => (
+      {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between">
             <span style={{ fontSize: fs.fontSize - 2 }}>
@@ -324,6 +332,31 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
       ))}
     </div>
   );
+}
+
+function sectionHasContent(type: SectionType, data: ResumeData): boolean {
+  switch (type) {
+    case "workExperience":
+      return data.workExperience.some((item) => item.company.trim());
+    case "education":
+      return data.education.some((item) => item.school.trim());
+    case "skills":
+      return data.skills.some((item) => item.category.trim() || item.items.length > 0);
+    case "projects":
+      return data.projects.some((item) => item.name.trim());
+    case "certificates":
+      return data.certificates.some((item) => item.name.trim());
+    case "languages":
+      return data.languages.some((item) => item.name.trim());
+    case "awards":
+      return data.awards.some((item) => item.name.trim());
+    case "personalInfo":
+      return true;
+    default: {
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
+  }
 }
 
 function SectionContent({
@@ -367,6 +400,9 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
     .filter((s) => s.visible)
     .sort((a, b) => a.order - b.order);
 
+  const personalInfoSection = sections.find((s) => s.type === "personalInfo");
+  const showPersonalInfo = personalInfoSection?.visible !== false;
+
   const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
   const safeGithub = personalInfo.github ? sanitizeUrl(personalInfo.github) : undefined;
   const safeWebsite = personalInfo.website ? sanitizeUrl(personalInfo.website) : undefined;
@@ -374,7 +410,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
   return (
     <div ref={contentRef} style={{ padding: fs.padding }}>
       {/* Header */}
-      <div
+      {showPersonalInfo && <div
         className="border-b-2 border-zinc-800"
         style={{
           marginBottom: fs.headerMarginBottom,
@@ -418,12 +454,12 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
             {personalInfo.summary}
           </p>
         )}
-      </div>
+      </div>}
 
       {/* Sections */}
       <div className="flex flex-col" style={{ gap: fs.sectionGap }}>
         {visibleSections
-          .filter((s) => s.type !== "personalInfo")
+          .filter((s) => s.type !== "personalInfo" && sectionHasContent(s.type, data))
           .map((section) => (
             <div key={section.id}>
               <h2
