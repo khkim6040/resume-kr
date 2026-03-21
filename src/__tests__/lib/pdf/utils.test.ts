@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { formatDate } from "@/lib/pdf/utils";
 
-describe("formatDate (pdf)", () => {
+describe("formatDate", () => {
   it("isCurrent가 true이면 '현재'를 반환한다", () => {
     expect(formatDate("2022-03", true)).toBe("현재");
   });
