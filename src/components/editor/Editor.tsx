@@ -331,40 +331,34 @@ export default function Editor() {
 
       {/* Sections */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
-        {isMounted ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={sorted.map((s) => s.id)}
-              strategy={verticalListSortingStrategy}
+        {(() => {
+          const sectionList = (
+            <div className="flex flex-col gap-3">
+              {sorted.map((section) => (
+                <SortableSection
+                  key={section.id}
+                  section={section}
+                  isExpanded={expandedIds.has(section.id)}
+                  onToggleExpand={() => toggleExpand(section.id)}
+                />
+              ))}
+            </div>
+          );
+          return isMounted ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              <div className="flex flex-col gap-3">
-                {sorted.map((section) => (
-                  <SortableSection
-                    key={section.id}
-                    section={section}
-                    isExpanded={expandedIds.has(section.id)}
-                    onToggleExpand={() => toggleExpand(section.id)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {sorted.map((section) => (
-              <SortableSection
-                key={section.id}
-                section={section}
-                isExpanded={expandedIds.has(section.id)}
-                onToggleExpand={() => toggleExpand(section.id)}
-              />
-            ))}
-          </div>
-        )}
+              <SortableContext
+                items={sorted.map((s) => s.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {sectionList}
+              </SortableContext>
+            </DndContext>
+          ) : sectionList;
+        })()}
       </div>
     </div>
   );

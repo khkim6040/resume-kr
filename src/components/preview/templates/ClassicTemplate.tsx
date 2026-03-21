@@ -350,8 +350,12 @@ function sectionHasContent(type: SectionType, data: ResumeData): boolean {
       return data.languages.some((item) => item.name.trim());
     case "awards":
       return data.awards.some((item) => item.name.trim());
-    default:
-      return false;
+    case "personalInfo":
+      return true;
+    default: {
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
   }
 }
 

@@ -110,6 +110,17 @@ describe("ClassicTemplate", () => {
       const headingTexts = headings.map((h) => h.textContent);
       expect(headingTexts).not.toContain("인적사항");
     });
+
+    it("personalInfo가 visible: false이면 헤더가 렌더링되지 않는다", () => {
+      renderTemplate(makeData({
+        personalInfo: { name: "홍길동", email: "test@test.com", phone: "010-0000-0000" },
+        sections: [
+          { id: "sec-personal", type: "personalInfo", title: "인적사항", visible: false, order: 0 },
+        ],
+      }));
+      expect(screen.queryByText("홍길동")).not.toBeInTheDocument();
+      expect(screen.queryByText("test@test.com")).not.toBeInTheDocument();
+    });
   });
 
   describe("경력 섹션", () => {
