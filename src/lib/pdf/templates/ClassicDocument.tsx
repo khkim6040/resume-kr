@@ -118,8 +118,8 @@ function WorkExperienceSection({ items }: { items: WorkExperience[] }) {
       {items.map((item) => {
         const lines = item.description.filter(line => line.trim());
         return (
-          <View key={item.id} wrap={false}>
-            <View style={st.itemRow}>
+          <View key={item.id}>
+            <View style={st.itemRow} wrap={false}>
               <Text style={st.itemTitle}>
                 {item.company}
                 {item.position ? <Text style={st.itemSub}> | {item.position}</Text> : null}
@@ -146,8 +146,8 @@ function EducationSection({ items }: { items: Education[] }) {
   return (
     <View style={{ gap: s.itemGap - 4 }}>
       {items.map((item) => (
-        <View key={item.id} wrap={false}>
-          <View style={st.itemRow}>
+        <View key={item.id}>
+          <View style={st.itemRow} wrap={false}>
             <Text style={st.itemTitle}>
               {item.school}
               {(item.degree || item.field) ? (
@@ -187,8 +187,8 @@ function ProjectsSection({ items }: { items: Project[] }) {
       {items.map((item) => {
         const lines = item.description.filter(line => line.trim());
         return (
-          <View key={item.id} wrap={false}>
-            <View style={st.itemRow}>
+          <View key={item.id}>
+            <View style={st.itemRow} wrap={false}>
               <Text style={st.itemTitle}>
                 {item.name}
                 {item.role ? <Text style={st.itemSub}> ({item.role})</Text> : null}

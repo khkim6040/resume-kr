@@ -119,6 +119,9 @@ function makeArrayActions<T extends { id: string }>(
     reorder: (fromIndex: number, toIndex: number) =>
       set((state) => {
         const items = [...(state.data[key] as unknown as T[])];
+        if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length || toIndex >= items.length) {
+          return { data: state.data };
+        }
         const [moved] = items.splice(fromIndex, 1);
         items.splice(toIndex, 0, moved);
         return { data: { ...state.data, [key]: items } };
@@ -234,7 +237,12 @@ export const useResumeStore = create<ResumeStore>()(
         // Migrate date format from YYYY.MM to YYYY-MM for type="month" inputs
         const data = state.data as Record<string, unknown> | undefined;
         if (data) {
-          const migrateDate = (d: string | undefined) => d?.replace(/\./g, '-');
+          const migrateDate = (d: string | undefined): string | undefined => {
+            if (typeof d !== 'string') return d;
+            const match = d.match(/^\s*(\d{4})\.(\d{1,2})\s*$/);
+            if (!match) return d;
+            return `${match[1]}-${match[2].padStart(2, '0')}`;
+          };
           const migrateItems = (items: Array<Record<string, unknown>> | undefined, fields: string[]) => {
             items?.forEach(item => {
               fields.forEach(f => {
