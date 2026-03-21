@@ -5,7 +5,7 @@ import type { WorkExperience, Education, Skill, Project, Certificate, Language, 
 // 각 테스트 전에 store를 초기 상태로 리셋
 beforeEach(() => {
   const { setState, getInitialState } = useResumeStore;
-  setState(getInitialState());
+  setState(getInitialState(), true);
 });
 
 describe("useResumeStore - 초기 상태", () => {
@@ -223,7 +223,7 @@ describe("useResumeStore - sections", () => {
   it("reorderSections: 섹션 순서를 변경할 수 있다", () => {
     // 기본: personalInfo(0), workExperience(1), education(2), ...
     useResumeStore.getState().reorderSections(1, 3);
-    const sections = useResumeStore.getState().data.sections
+    const sections = [...useResumeStore.getState().data.sections]
       .sort((a, b) => a.order - b.order);
     // workExperience가 index 3으로 이동
     expect(sections[0].type).toBe("personalInfo");
@@ -234,7 +234,7 @@ describe("useResumeStore - sections", () => {
 
   it("reorderSections: 뒤에서 앞으로 이동할 수 있다", () => {
     useResumeStore.getState().reorderSections(3, 0);
-    const sections = useResumeStore.getState().data.sections
+    const sections = [...useResumeStore.getState().data.sections]
       .sort((a, b) => a.order - b.order);
     expect(sections[0].type).toBe("skills");
     expect(sections[1].type).toBe("personalInfo");
@@ -242,7 +242,7 @@ describe("useResumeStore - sections", () => {
 
   it("reorderSections 후 order가 0부터 연속적이다", () => {
     useResumeStore.getState().reorderSections(0, 7);
-    const sections = useResumeStore.getState().data.sections
+    const sections = [...useResumeStore.getState().data.sections]
       .sort((a, b) => a.order - b.order);
     sections.forEach((s, i) => {
       expect(s.order).toBe(i);
@@ -301,8 +301,10 @@ describe("useResumeStore - setData", () => {
 });
 
 describe("useResumeStore - setTemplateId", () => {
-  it("templateId를 변경할 수 있다", () => {
+  it("setTemplateId 호출 시 dataVersion이 증가한다", () => {
+    const prevVersion = useResumeStore.getState().dataVersion;
     useResumeStore.getState().setTemplateId("classic");
     expect(useResumeStore.getState().templateId).toBe("classic");
+    expect(useResumeStore.getState().dataVersion).toBe(prevVersion + 1);
   });
 });
