@@ -135,6 +135,7 @@ export default function EducationEditor() {
                   <input
                     type="month"
                     value={item.endDate ?? ""}
+                    min={item.startDate || undefined}
                     onChange={(e) => updateEducation(item.id, { endDate: e.target.value })}
                     disabled={item.isCurrent}
                     className={`${INPUT} flex-1 disabled:bg-zinc-100 disabled:text-zinc-400`}
