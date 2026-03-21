@@ -177,12 +177,19 @@ function ProjectsSection({
       {items.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <span style={{ fontSize: fs.fontSize }} className="font-medium">
-              {item.name}
-              {item.role && (
-                <span className="ml-1 font-normal text-zinc-600">
-                  ({item.role})
-                </span>
+            <span className="flex items-center gap-1">
+              <span style={{ fontSize: fs.fontSize }} className="font-medium">
+                {item.name}
+                {item.role && (
+                  <span className="ml-1 font-normal text-zinc-600">
+                    ({item.role})
+                  </span>
+                )}
+              </span>
+              {item.link && (
+                <a href={item.link} target="_blank" rel="noopener noreferrer" title={item.link} aria-label="프로젝트 링크" className="inline-flex items-center text-zinc-500 hover:text-zinc-800">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </a>
               )}
             </span>
             <DateRange
