@@ -18,6 +18,8 @@ export function sectionHasContent(type: SectionType, data: ResumeData): boolean 
       return data.awards.some((item) => item.name.trim());
     case "personalInfo":
       return true;
+    case "custom":
+      return true;
     default: {
       const _exhaustive: never = type;
       return _exhaustive;

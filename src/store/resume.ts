@@ -38,6 +38,7 @@ const defaultResumeData: ResumeData = {
   languages: [],
   awards: [],
   sections: defaultSections,
+  customSections: {},
 };
 
 interface ResumeStore {
