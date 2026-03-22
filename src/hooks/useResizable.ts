@@ -5,10 +5,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const STORAGE_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 420;
 const MIN_WIDTH = 300;
-const MAX_WIDTH = 600;
+const STATIC_MAX = 800;
 
 export function useResizable() {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [maxWidth, setMaxWidth] = useState(STATIC_MAX);
 
   const widthRef = useRef(width);
   const isDragging = useRef(false);
@@ -19,12 +20,20 @@ export function useResizable() {
     widthRef.current = width;
   }, [width]);
 
+  useEffect(() => {
+    const update = () =>
+      setMaxWidth(Math.min(STATIC_MAX, Math.floor(window.innerWidth * 0.5)));
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
   // localStorage에서 저장된 너비 복원 (hydration 이후)
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = Number(stored);
-      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) {
+      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= STATIC_MAX) {
         setWidth(parsed);
       }
     }
@@ -48,7 +57,7 @@ export function useResizable() {
       if (!isDragging.current) return;
       const delta = e.clientX - startX.current;
       const newWidth = Math.min(
-        MAX_WIDTH,
+        maxWidth,
         Math.max(MIN_WIDTH, startWidth.current + delta)
       );
       setWidth(newWidth);
@@ -68,7 +77,7 @@ export function useResizable() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, []);
+  }, [maxWidth]);
 
   return { width, handleMouseDown, handleDoubleClick };
 }
