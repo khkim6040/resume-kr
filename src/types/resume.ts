@@ -43,6 +43,7 @@ export interface Project {
   role?: string;
   startDate: string;
   endDate?: string;
+  isCurrent: boolean;
   description: string[];
   techStack?: string[];
   link?: string;
