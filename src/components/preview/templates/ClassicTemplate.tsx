@@ -11,6 +11,9 @@ import type {
   Award,
   SectionType,
   ResumeData,
+  Section,
+  CustomSectionItem,
+  CustomFieldDefinition,
 } from "@/types/resume";
 import { sectionHasContent } from "@/lib/sectionHasContent";
 import type { RefObject } from "react";
@@ -337,17 +340,80 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
   );
 }
 
+function CustomSection({
+  items,
+  fieldDefs,
+  fs,
+}: {
+  items: CustomSectionItem[];
+  fieldDefs: CustomFieldDefinition[];
+  fs: FitStyles;
+}) {
+  const filtered = items.filter((item) =>
+    item.fields.some((f) =>
+      Array.isArray(f.value) ? f.value.some((v) => v.trim() !== "") : f.value.trim() !== "",
+    ),
+  );
+  if (filtered.length === 0) return <Placeholder />;
+
+  return (
+    <div className="flex flex-col" style={{ gap: fs.itemGap }}>
+      {filtered.map((item) => (
+        <div key={item.id}>
+          {fieldDefs.map((def) => {
+            const field = item.fields.find((f) => f.fieldId === def.id);
+            const val = field?.value ?? "";
+            switch (def.type) {
+              case "text":
+                return typeof val === "string" && val.trim() ? (
+                  <span key={def.id} style={{ fontSize: fs.fontSize - 2 }} className="text-zinc-700 block">
+                    {val}
+                  </span>
+                ) : null;
+              case "date":
+                return typeof val === "string" && val.trim() ? (
+                  <span key={def.id} className="text-zinc-500" style={{ fontSize: fs.fontSize - 2 }}>
+                    {formatDate(val)}
+                  </span>
+                ) : null;
+              case "link": {
+                const safeLink = typeof val === "string" ? sanitizeUrl(val) : undefined;
+                return safeLink ? (
+                  <a key={def.id} href={safeLink} target="_blank" rel="noopener noreferrer" className="text-zinc-600 hover:text-zinc-800" style={{ fontSize: fs.fontSize - 2 }}>
+                    {val}
+                  </a>
+                ) : null;
+              }
+              case "descriptionList": {
+                const lines = Array.isArray(val) ? val.filter((v) => v.trim()) : [];
+                return lines.length > 0 ? (
+                  <ul key={def.id} className="mt-1 space-y-0.5 pl-4">
+                    {lines.map((line, i) => (
+                      <li key={i} className="list-disc text-zinc-700" style={{ fontSize: fs.fontSize - 2, lineHeight: fs.lineHeight }}>
+                        {line}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null;
+              }
+            }
+          })}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function SectionContent({
-  type,
+  section,
   data,
   fs,
 }: {
-  type: SectionType;
+  section: Section;
   data: ResumeData;
   fs: FitStyles;
 }) {
-  switch (type) {
+  switch (section.type) {
     case "workExperience":
       return <WorkExperienceSection items={data.workExperience} fs={fs} />;
     case "education":
@@ -362,6 +428,14 @@ function SectionContent({
       return <LanguagesSection items={data.languages} fs={fs} />;
     case "awards":
       return <AwardsSection items={data.awards} fs={fs} />;
+    case "custom":
+      return (
+        <CustomSection
+          items={data.customSections[section.id] ?? []}
+          fieldDefs={section.fieldDefinitions ?? []}
+          fs={fs}
+        />
+      );
     default:
       return null;
   }
@@ -452,7 +526,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
               >
                 {section.title}
               </h2>
-              <SectionContent type={section.type} data={data} fs={fs} />
+              <SectionContent section={section} data={data} fs={fs} />
             </div>
           ))}
       </div>
