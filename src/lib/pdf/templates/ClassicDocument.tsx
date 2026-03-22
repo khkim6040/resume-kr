@@ -257,7 +257,7 @@ function ProjectsSection({ items }: { items: Project[] }) {
                 </Text>
                 {(() => { const safeLink = item.link ? sanitizeUrl(item.link) : undefined; return safeLink ? <Link src={safeLink} style={{textDecoration: 'none'}}><LinkIcon /></Link> : null; })()}
               </View>
-              <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent} />
+              <DateRange startDate={item.startDate} endDate={item.endDate} isCurrent={item.isCurrent ?? false} />
             </View>
             {lines.length > 0 && (
               <View style={st.bulletList}>

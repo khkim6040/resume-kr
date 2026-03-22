@@ -67,7 +67,14 @@ export default function ProjectsEditor() {
                 <input
                   type="checkbox"
                   checked={item.isCurrent}
-                  onChange={(e) => updateProject(item.id, { isCurrent: e.target.checked, endDate: undefined })}
+                  onChange={(e) =>
+                    updateProject(
+                      item.id,
+                      e.target.checked
+                        ? { isCurrent: true, endDate: undefined }
+                        : { isCurrent: false },
+                    )
+                  }
                 />
                 진행 중
               </label>

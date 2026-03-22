@@ -119,7 +119,14 @@ export default function EducationEditor() {
                 <input
                   type="checkbox"
                   checked={item.isCurrent}
-                  onChange={(e) => updateEducation(item.id, { isCurrent: e.target.checked, endDate: undefined })}
+                  onChange={(e) =>
+                    updateEducation(
+                      item.id,
+                      e.target.checked
+                        ? { isCurrent: true, endDate: undefined }
+                        : { isCurrent: false },
+                    )
+                  }
                 />
                 재학 중
               </label>

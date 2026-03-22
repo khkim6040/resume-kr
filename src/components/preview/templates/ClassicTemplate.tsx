@@ -204,7 +204,7 @@ function ProjectsSection({
             <DateRange
               startDate={item.startDate}
               endDate={item.endDate}
-              isCurrent={item.isCurrent}
+              isCurrent={item.isCurrent ?? false}
               fs={fs}
             />
           </div>
