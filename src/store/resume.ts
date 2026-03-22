@@ -254,7 +254,7 @@ export const useResumeStore = create<ResumeStore>()(
               type: "custom",
               title,
               visible: true,
-              order: state.data.sections.length,
+              order: state.data.sections.reduce((max, s) => Math.max(max, s.order), -1) + 1,
               fieldDefinitions,
             };
             return {

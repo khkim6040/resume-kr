@@ -9,7 +9,6 @@ import type {
   Certificate,
   Language,
   Award,
-  SectionType,
   ResumeData,
   Section,
   CustomSectionItem,

@@ -82,4 +82,36 @@ describe("sectionHasContent", () => {
     expect(sectionHasContent("education", makeData())).toBe(false);
     expect(sectionHasContent("projects", makeData())).toBe(false);
   });
+
+  it("custom: sectionId 없으면 false", () => {
+    expect(sectionHasContent("custom", makeData())).toBe(false);
+  });
+
+  it("custom: 빈 항목이면 false", () => {
+    expect(sectionHasContent("custom", makeData({
+      customSections: { "sec-1": [{ id: "i1", fields: [{ fieldId: "f1", value: "" }] }] },
+    }), "sec-1")).toBe(false);
+  });
+
+  it("custom: 값이 있는 텍스트 필드면 true", () => {
+    expect(sectionHasContent("custom", makeData({
+      customSections: { "sec-1": [{ id: "i1", fields: [{ fieldId: "f1", value: "내용" }] }] },
+    }), "sec-1")).toBe(true);
+  });
+
+  it("custom: 값이 있는 descriptionList 필드면 true", () => {
+    expect(sectionHasContent("custom", makeData({
+      customSections: { "sec-1": [{ id: "i1", fields: [{ fieldId: "f1", value: ["항목1"] }] }] },
+    }), "sec-1")).toBe(true);
+  });
+
+  it("custom: 빈 descriptionList면 false", () => {
+    expect(sectionHasContent("custom", makeData({
+      customSections: { "sec-1": [{ id: "i1", fields: [{ fieldId: "f1", value: [] }] }] },
+    }), "sec-1")).toBe(false);
+  });
+
+  it("custom: 존재하지 않는 sectionId면 false", () => {
+    expect(sectionHasContent("custom", makeData(), "nonexistent")).toBe(false);
+  });
 });

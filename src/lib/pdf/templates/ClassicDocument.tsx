@@ -1,7 +1,6 @@
 import { View, Text, Link, StyleSheet, Svg, Path, Circle, Line } from "@react-pdf/renderer";
 import type {
   ResumeData,
-  SectionType,
   WorkExperience,
   Education,
   Skill,
