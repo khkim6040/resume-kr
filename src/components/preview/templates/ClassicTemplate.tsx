@@ -137,6 +137,7 @@ function EducationSection({
               style={{
                 fontSize: fs.fontSize - 2,
                 lineHeight: fs.lineHeight,
+                whiteSpace: "pre-line",
               }}
             >
               {item.description}
@@ -324,6 +325,7 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
               style={{
                 fontSize: fs.fontSize - 2,
                 lineHeight: fs.lineHeight,
+                whiteSpace: "pre-line",
               }}
             >
               {item.description}
@@ -426,6 +428,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
             style={{
               fontSize: fs.fontSize - 2,
               lineHeight: fs.lineHeight,
+              whiteSpace: "pre-line",
             }}
           >
             {personalInfo.summary}
