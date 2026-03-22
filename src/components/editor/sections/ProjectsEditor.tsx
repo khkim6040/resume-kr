@@ -21,6 +21,7 @@ export default function ProjectsEditor() {
       id: crypto.randomUUID(),
       name: "",
       startDate: "",
+      isCurrent: false,
       description: [],
     };
     addProject(item);
@@ -47,20 +48,36 @@ export default function ProjectsEditor() {
                 className={`${INPUT} flex-1`}
               />
             </div>
-            <div className="flex flex-wrap gap-2 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
               <MonthInput
                 value={item.startDate}
                 onChange={(v) => updateProject(item.id, { startDate: v })}
                 placeholder="시작일 (2000.01)"
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
               />
               <MonthInput
                 value={item.endDate ?? ""}
                 min={item.startDate || undefined}
                 onChange={(v) => updateProject(item.id, { endDate: v })}
+                disabled={item.isCurrent}
                 placeholder="종료일 (2000.01)"
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
               />
+              <label className="flex items-center gap-1 text-sm text-zinc-600 whitespace-nowrap">
+                <input
+                  type="checkbox"
+                  checked={item.isCurrent}
+                  onChange={(e) =>
+                    updateProject(
+                      item.id,
+                      e.target.checked
+                        ? { isCurrent: true, endDate: undefined }
+                        : { isCurrent: false },
+                    )
+                  }
+                />
+                진행 중
+              </label>
             </div>
             <textarea
               placeholder="프로젝트 설명 (줄바꿈으로 항목 구분)"

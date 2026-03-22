@@ -67,7 +67,14 @@ export default function WorkExperienceEditor() {
                 <input
                   type="checkbox"
                   checked={item.isCurrent}
-                  onChange={(e) => updateWorkExperience(item.id, { isCurrent: e.target.checked, endDate: undefined })}
+                  onChange={(e) =>
+                    updateWorkExperience(
+                      item.id,
+                      e.target.checked
+                        ? { isCurrent: true, endDate: undefined }
+                        : { isCurrent: false },
+                    )
+                  }
                 />
                 현재 재직
               </label>

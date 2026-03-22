@@ -100,12 +100,12 @@ export default function EducationEditor() {
             >
               + 복수/부전공 추가
             </button>
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
               <MonthInput
                 value={item.startDate}
                 onChange={(v) => updateEducation(item.id, { startDate: v })}
                 placeholder="입학일 (2000.01)"
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
               />
               <MonthInput
                 value={item.endDate ?? ""}
@@ -113,13 +113,20 @@ export default function EducationEditor() {
                 onChange={(v) => updateEducation(item.id, { endDate: v })}
                 disabled={item.isCurrent}
                 placeholder="졸업일 (2000.01)"
-                className="flex-1"
+                className="flex-1 min-w-[120px]"
               />
               <label className="flex items-center gap-1 text-sm text-zinc-600 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={item.isCurrent}
-                  onChange={(e) => updateEducation(item.id, { isCurrent: e.target.checked, endDate: undefined })}
+                  onChange={(e) =>
+                    updateEducation(
+                      item.id,
+                      e.target.checked
+                        ? { isCurrent: true, endDate: undefined }
+                        : { isCurrent: false },
+                    )
+                  }
                 />
                 재학 중
               </label>
