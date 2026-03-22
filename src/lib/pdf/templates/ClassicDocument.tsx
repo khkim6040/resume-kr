@@ -249,7 +249,7 @@ function ProjectsSection({ items }: { items: Project[] }) {
           <View key={item.id}>
             <View style={st.itemRow} wrap={false}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}>
-                <Text style={{ ...st.itemTitle, flexGrow: 0 }}>
+                <Text style={{ ...st.itemTitle, flex: undefined, flexShrink: 1 }}>
                   {item.name}
                   {item.role ? <Text style={st.itemSub}> ({item.role})</Text> : null}
                 </Text>
