@@ -54,6 +54,7 @@ interface ResumeStore {
   setSections: (sections: Section[]) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
   toggleSectionVisibility: (sectionId: string) => void;
+  updateSectionTitle: (sectionId: string, title: string) => void;
 
   addWorkExperience: (item: WorkExperience) => void;
   updateWorkExperience: (id: string, item: Partial<WorkExperience>) => void;
@@ -196,6 +197,15 @@ export const useResumeStore = create<ResumeStore>()(
               ...state.data,
               sections: state.data.sections.map((s) =>
                 s.id === sectionId ? { ...s, visible: !s.visible } : s,
+              ),
+            },
+          })),
+        updateSectionTitle: (sectionId, title) =>
+          vSet((state) => ({
+            data: {
+              ...state.data,
+              sections: state.data.sections.map((s) =>
+                s.id === sectionId ? { ...s, title } : s,
               ),
             },
           })),

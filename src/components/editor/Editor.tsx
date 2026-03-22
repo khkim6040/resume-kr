@@ -25,7 +25,6 @@ import CertificatesEditor from "./sections/CertificatesEditor";
 import LanguagesEditor from "./sections/LanguagesEditor";
 import AwardsEditor from "./sections/AwardsEditor";
 import CustomSectionEditor from "./sections/CustomSectionEditor";
-import CreateSectionModal from "./CreateSectionModal";
 import DownloadButton from "./DownloadButton";
 
 // 각 섹션이 줄바꿈 없이 표시되기 위한 최소 사이드바 너비
@@ -176,7 +175,7 @@ function SortableSection({
   isExpanded: boolean;
   onToggleExpand: () => void;
 }) {
-  const { toggleSectionVisibility, removeCustomSection } = useResumeStore();
+  const { toggleSectionVisibility, removeCustomSection, updateSectionTitle } = useResumeStore();
   const {
     attributes,
     listeners,
@@ -225,9 +224,20 @@ function SortableSection({
           className="flex flex-1 items-center gap-2"
         >
           <SectionIcon type={section.type} />
-          <span className="flex-1 text-left text-sm font-medium text-zinc-700">
-            {section.title}
-          </span>
+          {section.type === "custom" ? (
+            <input
+              type="text"
+              value={section.title}
+              placeholder="섹션 이름"
+              onChange={(e) => updateSectionTitle(section.id, e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 text-left text-sm font-medium text-zinc-700 bg-transparent border-none outline-none focus:bg-zinc-50 focus:rounded px-1 -ml-1"
+            />
+          ) : (
+            <span className="flex-1 text-left text-sm font-medium text-zinc-700">
+              {section.title}
+            </span>
+          )}
           <svg
             width="16"
             height="16"
@@ -307,14 +317,12 @@ function SortableSection({
 }
 
 export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number) => void }) {
-  const { data, reorderSections } = useResumeStore();
+  const { data, reorderSections, addCustomSection } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
   // Prevent hydration mismatch from @dnd-kit aria-describedby IDs
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => setIsMounted(true), []);
-
-  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Accordion state: first section expanded by default
   const [expandedIds, setExpandedIds] = useState<Set<string>>(
@@ -397,15 +405,15 @@ export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number
           ) : sectionList;
         })()}
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {
+            const defaultField = { id: crypto.randomUUID(), name: "설명", type: "descriptionList" as const };
+            addCustomSection("", [defaultField]);
+          }}
           className="mt-3 w-full rounded-xl border-2 border-dashed border-zinc-200 px-3 py-3 text-sm text-zinc-400 transition-colors hover:border-zinc-300 hover:text-zinc-600"
         >
           + 새 섹션 만들기
         </button>
       </div>
-      {showCreateModal && (
-        <CreateSectionModal onClose={() => setShowCreateModal(false)} />
-      )}
     </div>
   );
 }
