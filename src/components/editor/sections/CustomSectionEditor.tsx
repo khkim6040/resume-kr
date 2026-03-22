@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useResumeStore } from "@/store/resume";
 import type { CustomFieldDefinition, CustomFieldType, CustomFieldValue, CustomSectionItem, Section } from "@/types/resume";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT =
   "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
@@ -200,11 +201,10 @@ export default function CustomSectionEditor({ section }: { section: Section }) {
                   return (
                     <div key={def.id} className="flex items-center gap-2">
                       <label className="text-xs text-zinc-500 shrink-0">{def.name}</label>
-                      <input
-                        type="month"
+                      <MonthInput
                         value={typeof val === "string" ? val : ""}
-                        onChange={(e) => setFieldValue(item, def.id, e.target.value)}
-                        className={`${INPUT} flex-1`}
+                        onChange={(v) => setFieldValue(item, def.id, v)}
+                        className="flex-1"
                       />
                     </div>
                   );
