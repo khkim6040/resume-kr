@@ -439,7 +439,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
       {/* Sections */}
       <div className="flex flex-col" style={{ gap: fs.sectionGap }}>
         {visibleSections
-          .filter((s) => s.type !== "personalInfo" && sectionHasContent(s.type, data))
+          .filter((s) => s.type !== "personalInfo" && sectionHasContent(s.type, data, s.id))
           .map((section) => (
             <div key={section.id}>
               <h2

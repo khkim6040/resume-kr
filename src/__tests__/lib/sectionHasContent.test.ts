@@ -12,6 +12,7 @@ function makeData(overrides: Partial<ResumeData> = {}): ResumeData {
     certificates: [],
     languages: [],
     awards: [],
+    customSections: {},
     sections: [],
     ...overrides,
   };

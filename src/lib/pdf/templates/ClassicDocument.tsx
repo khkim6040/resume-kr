@@ -344,7 +344,7 @@ function SectionContent({ type, data }: { type: SectionType; data: ResumeData })
 export function ClassicDocument({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data;
   const visibleSections = sections
-    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data))
+    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data, sec.id))
     .sort((a, b) => a.order - b.order);
 
   const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
