@@ -27,10 +27,10 @@ export function useAutoFit(dataVersion: number, scale: number = 2.8) {
   const lastDirectionRef = useRef<'up' | 'down' | null>(null);
   const a4HeightPx = 297 * scale;
 
-  // Reset direction when dataVersion changes
+  // Reset direction when dataVersion or scale changes
   useEffect(() => {
     lastDirectionRef.current = null;
-  }, [dataVersion]);
+  }, [dataVersion, scale]);
 
   const measure = useCallback(() => {
     const el = contentRef.current;
