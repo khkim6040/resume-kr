@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, type ChangeEvent } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect, type ChangeEvent } from "react";
 
 interface MonthInputProps {
   value: string;
@@ -35,35 +35,51 @@ function formatDigits(raw: string): string {
   return digits.slice(0, 4) + "." + mm;
 }
 
+function clampToMin(formatted: string, min: string | undefined): string {
+  if (!min || formatted.length !== 7) return formatted;
+  const minDisplay = toDisplay(min);
+  if (minDisplay.length !== 7) return formatted;
+  if (formatted < minDisplay) return minDisplay;
+  return formatted;
+}
+
 export default function MonthInput({
   value,
   onChange,
+  min,
   disabled,
   className = "",
   placeholder = "날짜 (2000.01)",
 }: MonthInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState(() => toDisplay(value));
+  const [isFocused, setIsFocused] = useState(false);
 
-  const displayValue = useMemo(() => toDisplay(value), [value]);
+  // Sync draft from external value changes when not focused
+  useEffect(() => {
+    if (!isFocused) {
+      setDraft(toDisplay(value));
+    }
+  }, [value, isFocused]);
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
       const formatted = formatDigits(raw);
-      const prevLen = displayValue.length;
+      const prevLen = draft.length;
       const nextLen = formatted.length;
 
-      if (!formatted) {
-        onChange("");
-        return;
-      }
+      setDraft(formatted);
 
-      // Only emit stored value when we have a complete YYYY.MM
+      // Emit to store only when complete YYYY.MM
       if (formatted.length === 7) {
-        onChange(toStored(formatted));
-      } else {
-        // Partial input — store as-is with dot conversion for consistency
-        onChange(toStored(formatted));
+        const clamped = clampToMin(formatted, min);
+        onChange(toStored(clamped));
+        if (clamped !== formatted) {
+          setDraft(clamped);
+        }
+      } else if (!formatted) {
+        onChange("");
       }
 
       // Fix cursor position after auto-inserting dot
@@ -71,13 +87,24 @@ export default function MonthInput({
         const el = inputRef.current;
         if (!el) return;
         if (prevLen === 4 && nextLen === 6) {
-          // Typed 5th digit, dot was inserted → cursor after the digit
           el.setSelectionRange(nextLen, nextLen);
         }
       });
     },
-    [displayValue, onChange],
+    [draft, min, onChange],
   );
+
+  const handleBlur = useCallback(() => {
+    setIsFocused(false);
+    // On blur, if incomplete input, revert to last valid value
+    if (draft.length !== 7 && draft.length !== 0) {
+      setDraft(toDisplay(value));
+    } else if (draft.length === 7) {
+      const clamped = clampToMin(draft, min);
+      onChange(toStored(clamped));
+      setDraft(clamped);
+    }
+  }, [draft, min, onChange, value]);
 
   const inputClass =
     "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
@@ -92,8 +119,10 @@ export default function MonthInput({
       inputMode="numeric"
       maxLength={7}
       placeholder={placeholder}
-      value={displayValue}
+      value={draft}
       onChange={handleChange}
+      onFocus={() => setIsFocused(true)}
+      onBlur={handleBlur}
       disabled={disabled}
       className={`${inputClass} ${disabledClass} ${className}`}
     />
