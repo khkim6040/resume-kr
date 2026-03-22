@@ -79,5 +79,13 @@ export function useResizable() {
     };
   }, []);
 
-  return { width, handleMouseDown, handleDoubleClick };
+  const requestWidth = useCallback((desired: number) => {
+    const clamped = Math.min(maxWidthRef.current, Math.max(MIN_WIDTH, desired));
+    if (clamped > widthRef.current) {
+      setWidth(clamped);
+      localStorage.setItem(STORAGE_KEY, String(clamped));
+    }
+  }, []);
+
+  return { width, handleMouseDown, handleDoubleClick, requestWidth };
 }
