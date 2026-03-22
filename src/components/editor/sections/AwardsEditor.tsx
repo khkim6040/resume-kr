@@ -36,7 +36,7 @@ export default function AwardsEditor() {
               onChange={(e) => updateAward(item.id, { name: e.target.value })}
               className={INPUT}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <input
                 type="text"
                 placeholder="발급기관"

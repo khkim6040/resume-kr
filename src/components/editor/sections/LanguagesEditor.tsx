@@ -28,7 +28,7 @@ export default function LanguagesEditor() {
       <SortableList items={items} onReorder={reorderLanguages}>
         {(item) => (
           <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-4">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <input
                 type="text"
                 placeholder="언어 (예: 영어)"

@@ -30,7 +30,7 @@ export default function ProjectsEditor() {
       <SortableList items={items} onReorder={reorderProjects}>
         {(item) => (
           <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-4">
-            <div className="flex gap-2 min-w-0">
+            <div className="flex flex-wrap gap-2 min-w-0">
               <input
                 type="text"
                 placeholder="프로젝트명"
@@ -46,7 +46,7 @@ export default function ProjectsEditor() {
                 className={`${INPUT} flex-1`}
               />
             </div>
-            <div className="flex gap-2 min-w-0">
+            <div className="flex flex-wrap gap-2 min-w-0">
               <input
                 type="month"
                 value={item.startDate}

@@ -31,7 +31,7 @@ export default function EducationEditor() {
       <SortableList items={items} onReorder={reorderEducation}>
         {(item) => (
           <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-4">
-            <div className="flex gap-2 min-w-0">
+            <div className="flex flex-wrap gap-2 min-w-0">
               <input
                 type="text"
                 placeholder="학교명"
@@ -56,7 +56,7 @@ export default function EducationEditor() {
             />
             {/* 복수/부전공 */}
             {(item.minors ?? []).map((minor, idx) => (
-              <div key={idx} className="flex gap-2 items-center">
+              <div key={idx} className="flex flex-wrap gap-2 items-center">
                 <input
                   type="text"
                   placeholder="학위 (예: 학사)"
