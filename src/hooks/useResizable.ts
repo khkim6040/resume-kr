@@ -21,7 +21,7 @@ export function useResizable() {
 
   useEffect(() => {
     const update = () => {
-      maxWidthRef.current = Math.min(STATIC_MAX, Math.floor(window.innerWidth * 0.5));
+      maxWidthRef.current = Math.max(MIN_WIDTH, Math.min(STATIC_MAX, Math.floor(window.innerWidth * 0.5)));
     };
     update();
     window.addEventListener("resize", update);

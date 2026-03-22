@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 
+const A4_HEIGHT_PX = 297 * 2.8; // 831.6px
 
 export type FitLevel = 0 | 1 | 2 | 3;
 
@@ -21,23 +22,22 @@ const FIT_PRESETS: Record<FitLevel, FitStyles> = {
   3: { sectionGap: 6,  fontSize: 11, headingSize: 13, nameSize: 18, itemGap: 6,  padding: 24, headerMarginBottom: 10, lineHeight: 1.35 },
 };
 
-export function useAutoFit(dataVersion: number, scale: number = 2.8) {
+export function useAutoFit(dataVersion: number) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [fitLevel, setFitLevel] = useState<FitLevel>(0);
   const lastDirectionRef = useRef<'up' | 'down' | null>(null);
-  const a4HeightPx = 297 * scale;
 
-  // Reset direction when dataVersion or scale changes
+  // Reset direction when dataVersion changes
   useEffect(() => {
     lastDirectionRef.current = null;
-  }, [dataVersion, scale]);
+  }, [dataVersion]);
 
   const measure = useCallback(() => {
     const el = contentRef.current;
     if (!el) return;
 
     const currentPadding = FIT_PRESETS[fitLevel].padding;
-    const availableHeight = a4HeightPx - currentPadding * 2;
+    const availableHeight = A4_HEIGHT_PX - currentPadding * 2;
     const contentHeight = el.scrollHeight;
 
     if (contentHeight > availableHeight && fitLevel < 3) {
@@ -48,14 +48,14 @@ export function useAutoFit(dataVersion: number, scale: number = 2.8) {
       // Check if we can decrease fit level (content might fit with less shrinking)
       const prevLevel = (fitLevel - 1) as FitLevel;
       const prevPadding = FIT_PRESETS[prevLevel].padding;
-      const prevAvailable = a4HeightPx - prevPadding * 2;
+      const prevAvailable = A4_HEIGHT_PX - prevPadding * 2;
       // Use a margin to prevent oscillation (content must be significantly smaller)
       if (contentHeight < prevAvailable * 0.92) {
         setFitLevel(prevLevel);
         lastDirectionRef.current = 'down';
       }
     }
-  }, [fitLevel, a4HeightPx]);
+  }, [fitLevel]);
 
   // Measure after render with RAF — no reset on dataVersion change
   useEffect(() => {
