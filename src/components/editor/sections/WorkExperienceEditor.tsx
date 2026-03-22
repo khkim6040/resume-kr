@@ -3,6 +3,7 @@
 import { useResumeStore } from "@/store/resume";
 import type { WorkExperience } from "@/types/resume";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -48,19 +49,19 @@ export default function WorkExperienceEditor() {
               />
             </div>
             <div className="flex flex-wrap items-center gap-2 min-w-0">
-              <input
-                type="month"
+              <MonthInput
                 value={item.startDate}
-                onChange={(e) => updateWorkExperience(item.id, { startDate: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateWorkExperience(item.id, { startDate: v })}
+                placeholder="입사일 (2000.01)"
+                className="flex-1"
               />
-              <input
-                type="month"
+              <MonthInput
                 value={item.endDate ?? ""}
                 min={item.startDate || undefined}
-                onChange={(e) => updateWorkExperience(item.id, { endDate: e.target.value })}
+                onChange={(v) => updateWorkExperience(item.id, { endDate: v })}
                 disabled={item.isCurrent}
-                className={`${INPUT} flex-1 disabled:bg-zinc-100 disabled:text-zinc-400`}
+                placeholder="퇴사일 (2000.01)"
+                className="flex-1"
               />
               <label className="flex items-center gap-1 text-sm text-zinc-600 whitespace-nowrap">
                 <input

@@ -3,6 +3,7 @@
 import { useResumeStore } from "@/store/resume";
 import type { Award } from "@/types/resume";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -44,11 +45,11 @@ export default function AwardsEditor() {
                 onChange={(e) => updateAward(item.id, { issuer: e.target.value })}
                 className={`${INPUT} flex-1`}
               />
-              <input
-                type="month"
+              <MonthInput
                 value={item.date}
-                onChange={(e) => updateAward(item.id, { date: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateAward(item.id, { date: v })}
+                placeholder="수상일 (2000.01)"
+                className="flex-1"
               />
             </div>
             <textarea

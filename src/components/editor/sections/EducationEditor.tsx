@@ -3,6 +3,7 @@
 import { useResumeStore } from "@/store/resume";
 import type { Education } from "@/types/resume";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -100,19 +101,19 @@ export default function EducationEditor() {
               + 복수/부전공 추가
             </button>
             <div className="flex items-center gap-2 min-w-0">
-              <input
-                type="month"
+              <MonthInput
                 value={item.startDate}
-                onChange={(e) => updateEducation(item.id, { startDate: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateEducation(item.id, { startDate: v })}
+                placeholder="입학일 (2000.01)"
+                className="flex-1"
               />
-              <input
-                type="month"
+              <MonthInput
                 value={item.endDate ?? ""}
                 min={item.startDate || undefined}
-                onChange={(e) => updateEducation(item.id, { endDate: e.target.value })}
+                onChange={(v) => updateEducation(item.id, { endDate: v })}
                 disabled={item.isCurrent}
-                className={`${INPUT} flex-1 disabled:bg-zinc-100 disabled:text-zinc-400`}
+                placeholder="졸업일 (2000.01)"
+                className="flex-1"
               />
               <label className="flex items-center gap-1 text-sm text-zinc-600 whitespace-nowrap">
                 <input

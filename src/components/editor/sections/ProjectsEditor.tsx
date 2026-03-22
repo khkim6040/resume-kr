@@ -4,6 +4,7 @@ import { useResumeStore } from "@/store/resume";
 import type { Project } from "@/types/resume";
 import TagInput from "../TagInput";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -47,18 +48,18 @@ export default function ProjectsEditor() {
               />
             </div>
             <div className="flex flex-wrap gap-2 min-w-0">
-              <input
-                type="month"
+              <MonthInput
                 value={item.startDate}
-                onChange={(e) => updateProject(item.id, { startDate: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateProject(item.id, { startDate: v })}
+                placeholder="시작일 (2000.01)"
+                className="flex-1"
               />
-              <input
-                type="month"
+              <MonthInput
                 value={item.endDate ?? ""}
                 min={item.startDate || undefined}
-                onChange={(e) => updateProject(item.id, { endDate: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateProject(item.id, { endDate: v })}
+                placeholder="종료일 (2000.01)"
+                className="flex-1"
               />
             </div>
             <textarea

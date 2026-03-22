@@ -3,6 +3,7 @@
 import { useResumeStore } from "@/store/resume";
 import type { Certificate } from "@/types/resume";
 import { SortableList } from "../SortableList";
+import MonthInput from "../MonthInput";
 
 const INPUT = "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none";
 
@@ -44,11 +45,11 @@ export default function CertificatesEditor() {
                 onChange={(e) => updateCertificate(item.id, { issuer: e.target.value })}
                 className={`${INPUT} flex-1`}
               />
-              <input
-                type="month"
+              <MonthInput
                 value={item.date}
-                onChange={(e) => updateCertificate(item.id, { date: e.target.value })}
-                className={`${INPUT} flex-1`}
+                onChange={(v) => updateCertificate(item.id, { date: v })}
+                placeholder="취득일 (2000.01)"
+                className="flex-1"
               />
             </div>
             <button
