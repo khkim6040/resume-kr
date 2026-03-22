@@ -69,6 +69,24 @@ export interface Award {
   description?: string;
 }
 
+export type CustomFieldType = "text" | "date" | "link" | "descriptionList";
+
+export interface CustomFieldDefinition {
+  id: string;
+  name: string;
+  type: CustomFieldType;
+}
+
+export interface CustomFieldValue {
+  fieldId: string;
+  value: string | string[];
+}
+
+export interface CustomSectionItem {
+  id: string;
+  fields: CustomFieldValue[];
+}
+
 export type SectionType =
   | "personalInfo"
   | "workExperience"
@@ -77,7 +95,8 @@ export type SectionType =
   | "projects"
   | "certificates"
   | "languages"
-  | "awards";
+  | "awards"
+  | "custom";
 
 export interface Section {
   id: string;
@@ -85,6 +104,7 @@ export interface Section {
   title: string;
   visible: boolean;
   order: number;
+  fieldDefinitions?: CustomFieldDefinition[];
 }
 
 export type TemplateId = "classic";
@@ -99,4 +119,5 @@ export interface ResumeData {
   languages: Language[];
   awards: Award[];
   sections: Section[];
+  customSections: Record<string, CustomSectionItem[]>;
 }

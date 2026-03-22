@@ -11,6 +11,9 @@ import type {
   Certificate,
   Language,
   Award,
+  CustomFieldDefinition,
+  CustomFieldValue,
+  CustomSectionItem,
 } from "@/types/resume";
 
 const defaultSections: Section[] = [
@@ -38,6 +41,7 @@ const defaultResumeData: ResumeData = {
   languages: [],
   awards: [],
   sections: defaultSections,
+  customSections: {},
 };
 
 interface ResumeStore {
@@ -50,6 +54,7 @@ interface ResumeStore {
   setSections: (sections: Section[]) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
   toggleSectionVisibility: (sectionId: string) => void;
+  updateSectionTitle: (sectionId: string, title: string) => void;
 
   addWorkExperience: (item: WorkExperience) => void;
   updateWorkExperience: (id: string, item: Partial<WorkExperience>) => void;
@@ -86,6 +91,14 @@ interface ResumeStore {
   reorderCertificates: (fromIndex: number, toIndex: number) => void;
   reorderLanguages: (fromIndex: number, toIndex: number) => void;
   reorderAwards: (fromIndex: number, toIndex: number) => void;
+
+  addCustomSection: (title: string, fieldDefinitions: CustomFieldDefinition[]) => void;
+  removeCustomSection: (sectionId: string) => void;
+  updateCustomSectionSchema: (sectionId: string, fieldDefinitions: CustomFieldDefinition[]) => void;
+  addCustomSectionItem: (sectionId: string, item: CustomSectionItem) => void;
+  updateCustomSectionItem: (sectionId: string, itemId: string, fields: CustomFieldValue[]) => void;
+  removeCustomSectionItem: (sectionId: string, itemId: string) => void;
+  reorderCustomSectionItems: (sectionId: string, fromIndex: number, toIndex: number) => void;
 }
 
 function makeArrayActions<T extends { id: string }>(
@@ -187,6 +200,15 @@ export const useResumeStore = create<ResumeStore>()(
               ),
             },
           })),
+        updateSectionTitle: (sectionId, title) =>
+          vSet((state) => ({
+            data: {
+              ...state.data,
+              sections: state.data.sections.map((s) =>
+                s.id === sectionId ? { ...s, title } : s,
+              ),
+            },
+          })),
 
         addWorkExperience: work.add,
         updateWorkExperience: work.update,
@@ -223,11 +245,114 @@ export const useResumeStore = create<ResumeStore>()(
         reorderCertificates: cert.reorder,
         reorderLanguages: lang.reorder,
         reorderAwards: award.reorder,
+
+        addCustomSection: (title, fieldDefinitions) =>
+          vSet((state) => {
+            const id = crypto.randomUUID();
+            const newSection: Section = {
+              id,
+              type: "custom",
+              title,
+              visible: true,
+              order: state.data.sections.reduce((max, s) => Math.max(max, s.order), -1) + 1,
+              fieldDefinitions,
+            };
+            return {
+              data: {
+                ...state.data,
+                sections: [...state.data.sections, newSection],
+                customSections: { ...state.data.customSections, [id]: [] },
+              },
+            };
+          }),
+
+        removeCustomSection: (sectionId) =>
+          vSet((state) => {
+            const { [sectionId]: _, ...rest } = state.data.customSections;
+            return {
+              data: {
+                ...state.data,
+                sections: state.data.sections.filter((s) => s.id !== sectionId),
+                customSections: rest,
+              },
+            };
+          }),
+
+        updateCustomSectionSchema: (sectionId, fieldDefinitions) =>
+          vSet((state) => {
+            const validFieldIds = new Set(fieldDefinitions.map((f) => f.id));
+            const cleanedItems = (state.data.customSections[sectionId] ?? []).map((item) => ({
+              ...item,
+              fields: item.fields.filter((f) => validFieldIds.has(f.fieldId)),
+            }));
+            return {
+              data: {
+                ...state.data,
+                sections: state.data.sections.map((s) =>
+                  s.id === sectionId ? { ...s, fieldDefinitions } : s,
+                ),
+                customSections: { ...state.data.customSections, [sectionId]: cleanedItems },
+              },
+            };
+          }),
+
+        addCustomSectionItem: (sectionId, item) =>
+          vSet((state) => ({
+            data: {
+              ...state.data,
+              customSections: {
+                ...state.data.customSections,
+                [sectionId]: [...(state.data.customSections[sectionId] ?? []), item],
+              },
+            },
+          })),
+
+        updateCustomSectionItem: (sectionId, itemId, fields) =>
+          vSet((state) => ({
+            data: {
+              ...state.data,
+              customSections: {
+                ...state.data.customSections,
+                [sectionId]: (state.data.customSections[sectionId] ?? []).map((item) =>
+                  item.id === itemId ? { ...item, fields } : item,
+                ),
+              },
+            },
+          })),
+
+        removeCustomSectionItem: (sectionId, itemId) =>
+          vSet((state) => ({
+            data: {
+              ...state.data,
+              customSections: {
+                ...state.data.customSections,
+                [sectionId]: (state.data.customSections[sectionId] ?? []).filter(
+                  (item) => item.id !== itemId,
+                ),
+              },
+            },
+          })),
+
+        reorderCustomSectionItems: (sectionId, fromIndex, toIndex) =>
+          vSet((state) => {
+            const items = [...(state.data.customSections[sectionId] ?? [])];
+            if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= items.length || toIndex >= items.length) {
+              return { data: state.data };
+            }
+            const [moved] = items.splice(fromIndex, 1);
+            items.splice(toIndex, 0, moved);
+            return {
+              data: {
+                ...state.data,
+                customSections: { ...state.data.customSections, [sectionId]: items },
+              },
+            };
+          }),
       };
     },
     {
       name: "resume-kr-storage",
-      version: 2,
+      version: 3,
       partialize: (state) => ({ data: state.data, templateId: state.templateId }),
       migrate: (persisted: unknown) => {
         const state = persisted as Record<string, unknown>;
@@ -257,6 +382,11 @@ export const useResumeStore = create<ResumeStore>()(
           migrateItems(data.projects as Array<Record<string, unknown>>, ['startDate', 'endDate']);
           migrateItems(data.certificates as Array<Record<string, unknown>>, ['date']);
           migrateItems(data.awards as Array<Record<string, unknown>>, ['date']);
+
+          // v2→v3: customSections 초기화
+          if (!data.customSections) {
+            data.customSections = {};
+          }
         }
         return state;
       },

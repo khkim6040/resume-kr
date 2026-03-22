@@ -26,6 +26,7 @@ function makeData(overrides: Partial<ResumeData> = {}): ResumeData {
     certificates: [],
     languages: [],
     awards: [],
+    customSections: {},
     sections: [
       { id: "sec-personal", type: "personalInfo", title: "인적사항", visible: true, order: 0 },
       { id: "sec-work", type: "workExperience", title: "경력", visible: true, order: 1 },

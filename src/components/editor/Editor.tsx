@@ -24,6 +24,7 @@ import ProjectsEditor from "./sections/ProjectsEditor";
 import CertificatesEditor from "./sections/CertificatesEditor";
 import LanguagesEditor from "./sections/LanguagesEditor";
 import AwardsEditor from "./sections/AwardsEditor";
+import CustomSectionEditor from "./sections/CustomSectionEditor";
 import DownloadButton from "./DownloadButton";
 
 // 각 섹션이 줄바꿈 없이 표시되기 위한 최소 사이드바 너비
@@ -50,6 +51,7 @@ const SECTION_ICONS: Record<string, string> = {
   certificates: "M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6zM9 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM7 15h4M15 9h3M15 13h3",
   languages: "M5 8l6 6 M4 14l6-6 2 2 M2 5h12 M7 2h1 M22 22l-5-10-5 10 M14 18h6",
   awards: "M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 8 7 8 M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 8 17 8 M12 2v7 M8 9h8l-1 8H9z M7 17l-2 5h14l-2-5",
+  custom: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8",
 };
 
 function SectionIcon({ type }: { type: string }) {
@@ -141,8 +143,8 @@ function PersonalInfoEditor() {
   );
 }
 
-function sectionContent(type: Section["type"]) {
-  switch (type) {
+function sectionContent(section: Section) {
+  switch (section.type) {
     case "personalInfo":
       return <PersonalInfoEditor />;
     case "workExperience":
@@ -159,6 +161,8 @@ function sectionContent(type: Section["type"]) {
       return <LanguagesEditor />;
     case "awards":
       return <AwardsEditor />;
+    case "custom":
+      return <CustomSectionEditor section={section} />;
   }
 }
 
@@ -171,7 +175,7 @@ function SortableSection({
   isExpanded: boolean;
   onToggleExpand: () => void;
 }) {
-  const { toggleSectionVisibility } = useResumeStore();
+  const { toggleSectionVisibility, removeCustomSection, updateSectionTitle } = useResumeStore();
   const {
     attributes,
     listeners,
@@ -220,9 +224,20 @@ function SortableSection({
           className="flex flex-1 items-center gap-2"
         >
           <SectionIcon type={section.type} />
-          <span className="flex-1 text-left text-sm font-medium text-zinc-700">
-            {section.title}
-          </span>
+          {section.type === "custom" ? (
+            <input
+              type="text"
+              value={section.title}
+              placeholder="섹션 이름"
+              onChange={(e) => updateSectionTitle(section.id, e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 text-left text-sm font-medium text-zinc-700 bg-transparent border-none outline-none focus:bg-zinc-50 focus:rounded px-1 -ml-1"
+            />
+          ) : (
+            <span className="flex-1 text-left text-sm font-medium text-zinc-700">
+              {section.title}
+            </span>
+          )}
           <svg
             width="16"
             height="16"
@@ -276,12 +291,25 @@ function SortableSection({
             </svg>
           )}
         </button>
+
+        {section.type === "custom" && (
+          <button
+            onClick={() => removeCustomSection(section.id)}
+            className="rounded-md p-1 text-zinc-300 transition-colors hover:bg-red-50 hover:text-red-500"
+            aria-label="섹션 삭제"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Section content - accordion */}
       {isExpanded && (
         <div className="border-t border-zinc-100 px-3 pb-3 pt-3">
-          {sectionContent(section.type)}
+          {sectionContent(section)}
         </div>
       )}
     </div>
@@ -289,7 +317,7 @@ function SortableSection({
 }
 
 export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number) => void }) {
-  const { data, reorderSections } = useResumeStore();
+  const { data, reorderSections, addCustomSection } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
   // Prevent hydration mismatch from @dnd-kit aria-describedby IDs
@@ -376,6 +404,15 @@ export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number
             </DndContext>
           ) : sectionList;
         })()}
+        <button
+          onClick={() => {
+            const defaultField = { id: crypto.randomUUID(), name: "설명", type: "descriptionList" as const };
+            addCustomSection("", [defaultField]);
+          }}
+          className="mt-3 w-full rounded-xl border-2 border-dashed border-zinc-200 px-3 py-3 text-sm text-zinc-400 transition-colors hover:border-zinc-300 hover:text-zinc-600"
+        >
+          + 새 섹션 만들기
+        </button>
       </div>
     </div>
   );

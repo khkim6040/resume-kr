@@ -1,7 +1,6 @@
 import { View, Text, Link, StyleSheet, Svg, Path, Circle, Line } from "@react-pdf/renderer";
 import type {
   ResumeData,
-  SectionType,
   WorkExperience,
   Education,
   Skill,
@@ -9,6 +8,9 @@ import type {
   Certificate,
   Language,
   Award,
+  Section,
+  CustomSectionItem,
+  CustomFieldDefinition,
 } from "@/types/resume";
 import { COLORS, SIZES } from "../tokens";
 import { formatDate } from "../utils";
@@ -328,8 +330,70 @@ function AwardsSection({ items }: { items: Award[] }) {
   );
 }
 
-function SectionContent({ type, data }: { type: SectionType; data: ResumeData }) {
-  switch (type) {
+function CustomSectionPdf({
+  items,
+  fieldDefs,
+}: {
+  items: CustomSectionItem[];
+  fieldDefs: CustomFieldDefinition[];
+}) {
+  const filtered = items.filter((item) =>
+    item.fields.some((f) =>
+      Array.isArray(f.value) ? f.value.some((v) => v.trim() !== "") : f.value.trim() !== "",
+    ),
+  );
+  if (filtered.length === 0) return null;
+
+  return (
+    <View style={{ gap: s.itemGap }}>
+      {filtered.map((item) => (
+        <View key={item.id}>
+          {fieldDefs.map((def) => {
+            const field = item.fields.find((f) => f.fieldId === def.id);
+            const val = field?.value ?? "";
+            switch (def.type) {
+              case "text":
+                return typeof val === "string" && val.trim() ? (
+                  <Text key={def.id} style={{ fontSize: s.smallFont, color: c.body }}>
+                    {val}
+                  </Text>
+                ) : null;
+              case "date":
+                return typeof val === "string" && val.trim() ? (
+                  <Text key={def.id} style={st.dateText}>
+                    {formatDate(val)}
+                  </Text>
+                ) : null;
+              case "link": {
+                const safeLink = typeof val === "string" ? sanitizeUrl(val) : undefined;
+                return safeLink ? (
+                  <Link key={def.id} src={safeLink} style={{ fontSize: s.smallFont, color: c.secondary, textDecoration: "none" }}>
+                    {val as string}
+                  </Link>
+                ) : null;
+              }
+              case "descriptionList": {
+                const lines = Array.isArray(val) ? val.filter((v) => v.trim()) : [];
+                return lines.length > 0 ? (
+                  <View key={def.id} style={st.bulletList}>
+                    {lines.map((line, i) => (
+                      <Text key={i} style={st.bulletItem}>
+                        {"•  "}{line}
+                      </Text>
+                    ))}
+                  </View>
+                ) : null;
+              }
+            }
+          })}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function SectionContent({ section, data }: { section: Section; data: ResumeData }) {
+  switch (section.type) {
     case "workExperience": return <WorkExperienceSection items={data.workExperience} />;
     case "education": return <EducationSection items={data.education} />;
     case "skills": return <SkillsSection items={data.skills} />;
@@ -337,6 +401,13 @@ function SectionContent({ type, data }: { type: SectionType; data: ResumeData })
     case "certificates": return <CertificatesSection items={data.certificates} />;
     case "languages": return <LanguagesSection items={data.languages} />;
     case "awards": return <AwardsSection items={data.awards} />;
+    case "custom":
+      return (
+        <CustomSectionPdf
+          items={data.customSections[section.id] ?? []}
+          fieldDefs={section.fieldDefinitions ?? []}
+        />
+      );
     default: return null;
   }
 }
@@ -344,7 +415,7 @@ function SectionContent({ type, data }: { type: SectionType; data: ResumeData })
 export function ClassicDocument({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data;
   const visibleSections = sections
-    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data))
+    .filter((sec) => sec.visible && sec.type !== "personalInfo" && sectionHasContent(sec.type, data, sec.id))
     .sort((a, b) => a.order - b.order);
 
   const safeLinkedin = personalInfo.linkedin ? sanitizeUrl(personalInfo.linkedin) : undefined;
@@ -374,7 +445,7 @@ export function ClassicDocument({ data }: { data: ResumeData }) {
         {visibleSections.map((section) => (
           <View key={section.id} style={st.sectionBlock}>
             <Text style={st.sectionTitle}>{section.title}</Text>
-            <SectionContent type={section.type} data={data} />
+            <SectionContent section={section} data={data} />
           </View>
         ))}
       </View>
