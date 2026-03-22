@@ -31,7 +31,7 @@ export default function WorkExperienceEditor() {
       <SortableList items={items} onReorder={reorderWorkExperience}>
         {(item) => (
           <div className="flex flex-col gap-2 rounded-lg border border-zinc-200 p-4">
-            <div className="flex gap-2 min-w-0">
+            <div className="flex flex-wrap gap-2 min-w-0">
               <input
                 type="text"
                 placeholder="회사명"
@@ -47,7 +47,7 @@ export default function WorkExperienceEditor() {
                 className={`${INPUT} flex-1`}
               />
             </div>
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 min-w-0">
               <input
                 type="month"
                 value={item.startDate}

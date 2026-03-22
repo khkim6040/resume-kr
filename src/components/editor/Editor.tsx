@@ -26,6 +26,17 @@ import LanguagesEditor from "./sections/LanguagesEditor";
 import AwardsEditor from "./sections/AwardsEditor";
 import DownloadButton from "./DownloadButton";
 
+// 각 섹션이 줄바꿈 없이 표시되기 위한 최소 사이드바 너비
+const SECTION_MIN_WIDTHS: Partial<Record<string, number>> = {
+  personalInfo: 420,
+  workExperience: 520,
+  education: 460,
+  projects: 480,
+  certificates: 400,
+  awards: 400,
+  languages: 380,
+  skills: 380,
+};
 
 const INPUT =
   "w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm transition-colors focus:border-zinc-400 focus:bg-white focus:outline-none";
@@ -277,7 +288,7 @@ function SortableSection({
   );
 }
 
-export default function Editor() {
+export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number) => void }) {
   const { data, reorderSections } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
@@ -297,6 +308,12 @@ export default function Editor() {
         next.delete(id);
       } else {
         next.add(id);
+        // 섹션이 펼쳐질 때 해당 섹션의 최소 너비로 사이드바 확장 요청
+        const section = sorted.find((s) => s.id === id);
+        if (section && onWidthRequest) {
+          const needed = SECTION_MIN_WIDTHS[section.type] ?? 380;
+          onWidthRequest(needed);
+        }
       }
       return next;
     });

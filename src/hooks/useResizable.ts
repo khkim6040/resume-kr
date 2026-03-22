@@ -5,27 +5,36 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const STORAGE_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 420;
 const MIN_WIDTH = 300;
-const MAX_WIDTH = 600;
+const STATIC_MAX = 800;
 
 export function useResizable() {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
-
   const widthRef = useRef(width);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startWidth = useRef(0);
+  const maxWidthRef = useRef(STATIC_MAX);
 
   useEffect(() => {
     widthRef.current = width;
   }, [width]);
+
+  useEffect(() => {
+    const update = () => {
+      maxWidthRef.current = Math.max(MIN_WIDTH, Math.min(STATIC_MAX, Math.floor(window.innerWidth * 0.5)));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   // localStorage에서 저장된 너비 복원 (hydration 이후)
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = Number(stored);
-      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= MAX_WIDTH) {
-        setWidth(parsed);
+      if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= STATIC_MAX) {
+        setWidth(Math.min(parsed, maxWidthRef.current));
       }
     }
   }, []);
@@ -48,7 +57,7 @@ export function useResizable() {
       if (!isDragging.current) return;
       const delta = e.clientX - startX.current;
       const newWidth = Math.min(
-        MAX_WIDTH,
+        maxWidthRef.current,
         Math.max(MIN_WIDTH, startWidth.current + delta)
       );
       setWidth(newWidth);
@@ -70,5 +79,13 @@ export function useResizable() {
     };
   }, []);
 
-  return { width, handleMouseDown, handleDoubleClick };
+  const requestWidth = useCallback((desired: number) => {
+    const clamped = Math.min(maxWidthRef.current, Math.max(MIN_WIDTH, desired));
+    if (clamped > widthRef.current) {
+      setWidth(clamped);
+      localStorage.setItem(STORAGE_KEY, String(clamped));
+    }
+  }, []);
+
+  return { width, handleMouseDown, handleDoubleClick, requestWidth };
 }

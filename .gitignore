@@ -42,6 +42,9 @@ yarn-error.log*
 # omc
 .omc/
 
+# superpowers
+docs/superpowers/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
