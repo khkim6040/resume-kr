@@ -59,7 +59,7 @@ function WorkExperienceSection({
       {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <span style={{ fontSize: fs.fontSize }} className="font-medium">
+            <span style={{ fontSize: fs.fontSize }} className="min-w-0 flex-1 font-medium">
               {item.company}
               {item.position && (
                 <span className="ml-1 font-normal text-zinc-600">
@@ -113,7 +113,7 @@ function EducationSection({
       {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <span style={{ fontSize: fs.fontSize }} className="font-medium">
+            <span style={{ fontSize: fs.fontSize }} className="min-w-0 flex-1 font-medium">
               {item.school}
               {(item.degree || item.field) && (
                 <span className="ml-1 font-normal text-zinc-600">
@@ -186,7 +186,7 @@ function ProjectsSection({
       {filtered.map((item) => (
         <div key={item.id}>
           <div className="flex items-baseline justify-between gap-2">
-            <span className="flex items-center gap-1">
+            <span className="flex min-w-0 flex-1 items-center gap-1">
               <span style={{ fontSize: fs.fontSize }} className="font-medium">
                 {item.name}
                 {item.role && (
@@ -258,15 +258,15 @@ function CertificatesSection({
   return (
     <div className="flex flex-col" style={{ gap: Math.max(fs.itemGap - 10, 4) }}>
       {filtered.map((item) => (
-        <div key={item.id} className="flex items-baseline justify-between">
-          <span style={{ fontSize: fs.fontSize - 2 }}>
+        <div key={item.id} className="flex items-baseline justify-between gap-2">
+          <span className="min-w-0 flex-1" style={{ fontSize: fs.fontSize - 2 }}>
             <span className="font-medium">{item.name}</span>
             {item.issuer && (
               <span className="ml-1 text-zinc-600">- {item.issuer}</span>
             )}
           </span>
           <span
-            className="text-zinc-500"
+            className="shrink-0 text-zinc-500"
             style={{ fontSize: fs.fontSize - 2 }}
           >
             {formatDate(item.date)}
@@ -307,15 +307,15 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
     <div className="flex flex-col" style={{ gap: fs.itemGap - 4 }}>
       {filtered.map((item) => (
         <div key={item.id}>
-          <div className="flex items-baseline justify-between">
-            <span style={{ fontSize: fs.fontSize - 2 }}>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="min-w-0 flex-1" style={{ fontSize: fs.fontSize - 2 }}>
               <span className="font-medium">{item.name}</span>
               {item.issuer && (
                 <span className="ml-1 text-zinc-600">- {item.issuer}</span>
               )}
             </span>
             <span
-              className="text-zinc-500"
+              className="shrink-0 text-zinc-500"
               style={{ fontSize: fs.fontSize - 2 }}
             >
               {formatDate(item.date)}
