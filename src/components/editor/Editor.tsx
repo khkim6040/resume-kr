@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { validateEmail, validatePhone } from "@/lib/validation";
 import {
   DndContext,
   PointerSensor,
@@ -77,6 +78,7 @@ function SectionIcon({ type }: { type: string }) {
 function PersonalInfoEditor() {
   const { data, updatePersonalInfo } = useResumeStore();
   const { personalInfo } = data;
+  const [errors, setErrors] = useState<{ email?: string; phone?: string }>({});
   return (
     <div className="flex flex-col gap-2.5">
       <input
@@ -87,20 +89,44 @@ function PersonalInfoEditor() {
         className={INPUT}
       />
       <div className="grid grid-cols-2 gap-2.5 min-w-0">
-        <input
-          type="email"
-          placeholder="이메일"
-          value={personalInfo.email}
-          onChange={(e) => updatePersonalInfo({ email: e.target.value })}
-          className={INPUT}
-        />
-        <input
-          type="tel"
-          placeholder="전화번호"
-          value={personalInfo.phone}
-          onChange={(e) => updatePersonalInfo({ phone: e.target.value })}
-          className={INPUT}
-        />
+        <div>
+          <input
+            type="email"
+            placeholder="이메일"
+            value={personalInfo.email}
+            onChange={(e) => {
+              updatePersonalInfo({ email: e.target.value });
+              if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+            }}
+            onBlur={(e) => {
+              const msg = validateEmail(e.target.value);
+              setErrors((prev) => ({ ...prev, email: msg ?? undefined }));
+            }}
+            className={`${INPUT}${errors.email ? " ring-1 ring-red-400" : ""}`}
+          />
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+          )}
+        </div>
+        <div>
+          <input
+            type="tel"
+            placeholder="전화번호"
+            value={personalInfo.phone}
+            onChange={(e) => {
+              updatePersonalInfo({ phone: e.target.value });
+              if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
+            }}
+            onBlur={(e) => {
+              const msg = validatePhone(e.target.value);
+              setErrors((prev) => ({ ...prev, phone: msg ?? undefined }));
+            }}
+            className={`${INPUT}${errors.phone ? " ring-1 ring-red-400" : ""}`}
+          />
+          {errors.phone && (
+            <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+          )}
+        </div>
       </div>
       <input
         type="text"
