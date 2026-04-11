@@ -303,6 +303,47 @@ describe("ClassicTemplate", () => {
     });
   });
 
+  describe("긴 URL / 오버플로우", () => {
+    it("긴 URL이 포함된 프로젝트를 에러 없이 렌더링한다", () => {
+      const longUrl = "https://github.com/user/very-long-repository-name-that-exceeds-normal-width/blob/main/src/components/some/deeply/nested/component.tsx";
+      renderTemplate(makeData({
+        sections: [
+          { id: "sec-projects", type: "projects", title: "프로젝트", visible: true, order: 0 },
+        ],
+        projects: [{
+          id: "p1",
+          name: "테스트 프로젝트",
+          startDate: "2024-01",
+          description: [],
+          link: longUrl,
+        }],
+      }));
+      const link = screen.getByLabelText("프로젝트 링크");
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveAttribute("href", longUrl);
+    });
+
+    it("긴 URL이 포함된 커스텀 섹션을 에러 없이 렌더링한다", () => {
+      const longUrl = "https://example.com/verylongpathwithoutspacessoitwilloverflowthecontainerunlessbreakallisapplied";
+      renderTemplate(makeData({
+        sections: [
+          { id: "sec-custom-1", type: "custom", title: "포트폴리오", visible: true, order: 0, fieldDefinitions: [
+            { id: "fd-link", label: "링크", type: "link" },
+          ]},
+        ],
+        customSections: {
+          "sec-custom-1": [{
+            id: "item-1",
+            fields: [{ fieldId: "fd-link", value: longUrl }],
+          }],
+        },
+      }));
+      const link = screen.getByRole("link", { name: longUrl });
+      expect(link).toBeInTheDocument();
+      expect(link).toHaveClass("break-all");
+    });
+  });
+
   describe("섹션 순서", () => {
     it("order에 따라 섹션이 정렬된다", () => {
       renderTemplate(makeData({
