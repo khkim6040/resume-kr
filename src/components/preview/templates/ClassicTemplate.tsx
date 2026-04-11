@@ -378,7 +378,7 @@ function CustomSection({
               case "link": {
                 const safeLink = typeof val === "string" ? sanitizeUrl(val) : undefined;
                 return safeLink ? (
-                  <a key={def.id} href={safeLink} target="_blank" rel="noopener noreferrer" className="text-zinc-600 hover:text-zinc-800" style={{ fontSize: fs.fontSize - 2 }}>
+                  <a key={def.id} href={safeLink} target="_blank" rel="noopener noreferrer" className="text-zinc-600 hover:text-zinc-800 break-all" style={{ fontSize: fs.fontSize - 2 }}>
                     {val}
                   </a>
                 ) : null;

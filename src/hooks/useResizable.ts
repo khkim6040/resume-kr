@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { safeGetItem, safeSetItem } from "@/lib/safeStorage";
 
 const STORAGE_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 420;
@@ -30,7 +31,7 @@ export function useResizable() {
 
   // localStorage에서 저장된 너비 복원 (hydration 이후)
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = safeGetItem(STORAGE_KEY);
     if (stored) {
       const parsed = Number(stored);
       if (!Number.isNaN(parsed) && parsed >= MIN_WIDTH && parsed <= STATIC_MAX) {
@@ -49,7 +50,7 @@ export function useResizable() {
 
   const handleDoubleClick = useCallback(() => {
     setWidth(DEFAULT_WIDTH);
-    localStorage.setItem(STORAGE_KEY, String(DEFAULT_WIDTH));
+    safeSetItem(STORAGE_KEY, String(DEFAULT_WIDTH));
   }, []);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export function useResizable() {
       isDragging.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
-      localStorage.setItem(STORAGE_KEY, String(widthRef.current));
+      safeSetItem(STORAGE_KEY, String(widthRef.current));
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -83,7 +84,7 @@ export function useResizable() {
     const clamped = Math.min(maxWidthRef.current, Math.max(MIN_WIDTH, desired));
     if (clamped > widthRef.current) {
       setWidth(clamped);
-      localStorage.setItem(STORAGE_KEY, String(clamped));
+      safeSetItem(STORAGE_KEY, String(clamped));
     }
   }, []);
 

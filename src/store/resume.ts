@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "@/lib/safeStorage";
 import type {
   ResumeData,
   Section,
@@ -352,6 +353,11 @@ export const useResumeStore = create<ResumeStore>()(
     },
     {
       name: "resume-kr-storage",
+      storage: createJSONStorage(() => ({
+        getItem: safeGetItem,
+        setItem: safeSetItem,
+        removeItem: safeRemoveItem,
+      })),
       version: 3,
       partialize: (state) => ({ data: state.data, templateId: state.templateId }),
       migrate: (persisted: unknown) => {

@@ -72,6 +72,7 @@ export default function Preview() {
               minHeight: BASE_HEIGHT,
               fontFamily: "Pretendard, sans-serif",
               wordBreak: "keep-all",
+              overflowWrap: "break-word",
               transform: `scale(${zoom})`,
               transformOrigin: "top left",
               backgroundImage: `repeating-linear-gradient(
