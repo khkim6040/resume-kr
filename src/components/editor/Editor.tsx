@@ -343,7 +343,15 @@ function SortableSection({
   );
 }
 
-export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number) => void }) {
+export default function Editor({
+  onWidthRequest,
+  collapsed,
+  onToggleCollapse,
+}: {
+  onWidthRequest?: (w: number) => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}) {
   const { data, reorderSections, addCustomSection } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
@@ -391,13 +399,36 @@ export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b border-zinc-200 bg-white px-5 py-3">
-        <ImportButton />
-        <DownloadButton />
+      <div className={`flex items-center gap-2 border-b border-zinc-200 bg-white py-3 ${collapsed ? "justify-center px-2" : "px-5"}`}>
+        {!collapsed && (
+          <>
+            <ImportButton />
+            <DownloadButton />
+          </>
+        )}
+        <button
+          onClick={onToggleCollapse}
+          className={`rounded-lg border border-zinc-300 bg-white px-2 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 ${collapsed ? "" : "ml-auto"}`}
+          title={collapsed ? "사이드바 펼치기" : "사이드바 접기"}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points={collapsed ? "9 18 15 12 9 6" : "15 18 9 12 15 6"} />
+          </svg>
+        </button>
       </div>
 
       {/* Sections */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4">
+      <div className={`flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 ${collapsed ? "hidden" : ""}`}>
         {(() => {
           const sectionList = (
             <div className="flex flex-col gap-3">
