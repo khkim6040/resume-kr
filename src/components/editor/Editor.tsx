@@ -27,6 +27,7 @@ import LanguagesEditor from "./sections/LanguagesEditor";
 import AwardsEditor from "./sections/AwardsEditor";
 import CustomSectionEditor from "./sections/CustomSectionEditor";
 import DownloadButton from "./DownloadButton";
+import ImportButton from "./ImportButton";
 
 // 각 섹션이 줄바꿈 없이 표시되기 위한 최소 사이드바 너비
 const SECTION_MIN_WIDTHS: Partial<Record<string, number>> = {
@@ -390,13 +391,8 @@ export default function Editor({ onWidthRequest }: { onWidthRequest?: (w: number
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-5 py-4">
-        <div>
-          <h1 className="text-lg font-bold text-zinc-800">이력서 편집</h1>
-          <p className="mt-0.5 text-xs text-zinc-400">
-            섹션을 드래그하여 순서를 변경할 수 있습니다
-          </p>
-        </div>
+      <div className="flex items-center gap-2 border-b border-zinc-200 bg-white px-5 py-3">
+        <ImportButton />
         <DownloadButton />
       </div>
 
