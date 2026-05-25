@@ -10,10 +10,13 @@ interface Props {
   templateId: TemplateId;
 }
 
+const RESUME_DATA_PREFIX = "RESUME_KR_DATA:";
+
 export function ResumeDocument({ data, templateId }: Props) {
   const Template = PDF_TEMPLATES[templateId];
+  const encoded = RESUME_DATA_PREFIX + btoa(unescape(encodeURIComponent(JSON.stringify(data))));
   return (
-    <Document>
+    <Document subject={encoded}>
       <Page size="A4" style={{ fontFamily: "Pretendard" }}>
         <Template data={data} />
       </Page>
