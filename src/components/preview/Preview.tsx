@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useLayoutEffect, useState, type RefObject } from "react";
 import { useResumeStore } from "@/store/resume";
 import { useAutoFit } from "@/hooks/useAutoFit";
 import { A4Content } from "./A4Content";
@@ -16,10 +16,32 @@ const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.0;
 const ZOOM_STEP = 0.1;
 
+// PDF(ClassicDocument)처럼 페이지 경계를 넘는 섹션을 다음 페이지 상단 여백 뒤로 민다. 첫 섹션은 PDF와 같이 제외한다
+function usePageBreaks(contentRef: RefObject<HTMLDivElement | null>, padding: number) {
+  useLayoutEffect(() => {
+    const blocks = contentRef.current?.querySelectorAll<HTMLElement>("[data-section-block]");
+    if (!blocks) return;
+    blocks.forEach((el) => (el.style.marginTop = ""));
+    blocks.forEach((el, i) => {
+      if (i === 0) return;
+      // offsetTop은 페이지 div(relative) 기준이고 transform(zoom)의 영향을 받지 않는다
+      const top = el.offsetTop;
+      const page = Math.floor(top / BASE_HEIGHT);
+      const pageEnd = (page + 1) * BASE_HEIGHT - padding;
+      const nextStart = (page + 1) * BASE_HEIGHT + padding;
+      const atPageStart = top <= page * BASE_HEIGHT + padding + 1;
+      if (!atPageStart && top + el.offsetHeight > pageEnd) {
+        el.style.marginTop = `${nextStart - top}px`;
+      }
+    });
+  });
+}
+
 export default function Preview() {
   const { data, dataVersion, templateId } = useResumeStore();
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const { contentRef, styles: fs } = useAutoFit(dataVersion);
+  usePageBreaks(contentRef, fs.padding);
 
   return (
     <div className="flex h-full flex-col">

@@ -514,7 +514,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
         {visibleSections
           .filter((s) => s.type !== "personalInfo" && sectionHasContent(s.type, data, s.id))
           .map((section) => (
-            <div key={section.id}>
+            <div key={section.id} data-section-block>
               <h2
                 className="border-b border-zinc-200 font-semibold text-zinc-800"
                 style={{
