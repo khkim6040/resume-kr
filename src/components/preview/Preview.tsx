@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useState, type RefObject } from "react";
+import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { useResumeStore } from "@/store/resume";
 import { useAutoFit } from "@/hooks/useAutoFit";
 import { A4Content } from "./A4Content";
@@ -16,8 +16,13 @@ const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.0;
 const ZOOM_STEP = 0.1;
 
-// PDF(ClassicDocument)처럼 페이지 경계를 넘는 섹션을 다음 페이지 상단 여백 뒤로 민다. 첫 섹션은 PDF와 같이 제외한다
-function usePageBreaks(contentRef: RefObject<HTMLDivElement | null>, padding: number) {
+// PDF(ClassicDocument)처럼 페이지 경계를 넘는 섹션을 다음 페이지 상단 여백 뒤로 민다. 첫 섹션은 PDF와 같이 제외한다.
+// 용지는 마지막 페이지 끝까지 채운다
+function usePageBreaks(
+  contentRef: RefObject<HTMLDivElement | null>,
+  pageRef: RefObject<HTMLDivElement | null>,
+  padding: number,
+) {
   useLayoutEffect(() => {
     const blocks = contentRef.current?.querySelectorAll<HTMLElement>("[data-section-block]");
     if (!blocks) return;
@@ -34,6 +39,10 @@ function usePageBreaks(contentRef: RefObject<HTMLDivElement | null>, padding: nu
         el.style.marginTop = `${nextStart - top}px`;
       }
     });
+    if (contentRef.current && pageRef.current) {
+      const pages = Math.max(1, Math.ceil(contentRef.current.offsetHeight / BASE_HEIGHT));
+      pageRef.current.style.minHeight = `${pages * BASE_HEIGHT}px`;
+    }
   });
 }
 
@@ -41,7 +50,8 @@ export default function Preview() {
   const { data, dataVersion, templateId } = useResumeStore();
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const { contentRef, styles: fs } = useAutoFit(dataVersion);
-  usePageBreaks(contentRef, fs.padding);
+  const pageRef = useRef<HTMLDivElement>(null);
+  usePageBreaks(contentRef, pageRef, fs.padding);
 
   return (
     <div className="flex h-full flex-col">
@@ -88,10 +98,10 @@ export default function Preview() {
         >
           {/* Fixed-size A4 page with CSS transform for zoom */}
           <div
+            ref={pageRef}
             className="relative bg-white shadow-lg"
             style={{
               width: BASE_WIDTH,
-              minHeight: BASE_HEIGHT,
               fontFamily: "Pretendard, sans-serif",
               wordBreak: "keep-all",
               overflowWrap: "break-word",
