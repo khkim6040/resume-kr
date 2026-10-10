@@ -16,28 +16,61 @@ const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 2.0;
 const ZOOM_STEP = 0.1;
 
+// el이 y에서 시작하도록 margin-top을 늘린다. 앞 형제·부모 margin과 상쇄되면 덜 내려가므로 다시 재서 보정한다
+function moveTo(el: HTMLElement, y: number) {
+  for (let i = 0; i < 2 && el.offsetTop < y - 0.5; i++) {
+    el.style.marginTop = `${parseFloat(getComputedStyle(el).marginTop) + y - el.offsetTop}px`;
+    el.dataset.pageShift = "";
+  }
+}
+
+// 자식 단위로 나눌 수 있는 세로 블록인가. 가로 flex 행, 리스트 항목, 인라인이 섞인 블록, data-page-keep은 통째로 민다
+function splittable(el: HTMLElement) {
+  if (el.hasAttribute("data-page-keep")) return false;
+  const { display, flexDirection } = getComputedStyle(el);
+  if (display === "flex") return flexDirection === "column";
+  if (display !== "block") return false;
+  return [...el.childNodes].every((n) =>
+    n instanceof HTMLElement ? !getComputedStyle(n).display.startsWith("inline") : !n.textContent?.trim(),
+  );
+}
+
+// offsetTop은 페이지 div(relative) 기준이고 transform(zoom)의 영향을 받지 않는다
+function fitToPage(el: HTMLElement, padding: number) {
+  const top = el.offsetTop;
+  const page = Math.floor(top / BASE_HEIGHT);
+  const start = page * BASE_HEIGHT + padding;
+  if (page > 0 && top < start) moveTo(el, start);
+  if (el.offsetTop + el.offsetHeight <= (page + 1) * BASE_HEIGHT - padding) return;
+  if (splittable(el)) {
+    for (const child of el.children) fitToPage(child as HTMLElement, padding);
+  } else if (el.offsetTop > start + 1) {
+    moveTo(el, (page + 1) * BASE_HEIGHT + padding);
+  }
+}
+
 // PDF(ClassicDocument)처럼 페이지 경계를 넘는 섹션을 다음 페이지 상단 여백 뒤로 민다. 첫 섹션은 PDF와 같이 제외한다.
-// 용지는 마지막 페이지 끝까지 채운다
+// 한 페이지보다 긴 섹션은 항목·줄 단위로 나눠 경계에 걸친 것만 민다. 용지는 마지막 페이지 끝까지 채운다
 function usePageBreaks(
   contentRef: RefObject<HTMLDivElement | null>,
   pageRef: RefObject<HTMLDivElement | null>,
   padding: number,
 ) {
   useLayoutEffect(() => {
-    const blocks = contentRef.current?.querySelectorAll<HTMLElement>("[data-section-block]");
-    if (!blocks) return;
-    blocks.forEach((el) => (el.style.marginTop = ""));
-    blocks.forEach((el, i) => {
-      if (i === 0) return;
-      // offsetTop은 페이지 div(relative) 기준이고 transform(zoom)의 영향을 받지 않는다
+    const content = contentRef.current;
+    if (!content) return;
+    content.querySelectorAll<HTMLElement>("[data-page-shift]").forEach((el) => {
+      el.style.marginTop = "";
+      delete el.dataset.pageShift;
+    });
+    content.querySelectorAll<HTMLElement>("[data-section-block]").forEach((el, i) => {
       const top = el.offsetTop;
       const page = Math.floor(top / BASE_HEIGHT);
-      const pageEnd = (page + 1) * BASE_HEIGHT - padding;
-      const nextStart = (page + 1) * BASE_HEIGHT + padding;
       const atPageStart = top <= page * BASE_HEIGHT + padding + 1;
-      if (!atPageStart && top + el.offsetHeight > pageEnd) {
-        el.style.marginTop = `${nextStart - top}px`;
+      if (i > 0 && !atPageStart && top + el.offsetHeight > (page + 1) * BASE_HEIGHT - padding) {
+        moveTo(el, (page + 1) * BASE_HEIGHT + padding);
       }
+      fitToPage(el, padding);
     });
     if (contentRef.current && pageRef.current) {
       const pages = Math.max(1, Math.ceil(contentRef.current.offsetHeight / BASE_HEIGHT));

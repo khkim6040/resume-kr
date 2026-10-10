@@ -306,7 +306,7 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
   return (
     <div className="flex flex-col" style={{ gap: fs.itemGap - 4 }}>
       {filtered.map((item) => (
-        <div key={item.id}>
+        <div key={item.id} data-page-keep>
           <div className="flex items-baseline justify-between gap-2">
             <span className="min-w-0 flex-1" style={{ fontSize: fs.fontSize - 2 }}>
               <span className="font-medium">{item.name}</span>
