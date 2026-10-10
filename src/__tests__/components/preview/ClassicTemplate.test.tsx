@@ -328,7 +328,7 @@ describe("ClassicTemplate", () => {
       renderTemplate(makeData({
         sections: [
           { id: "sec-custom-1", type: "custom", title: "포트폴리오", visible: true, order: 0, fieldDefinitions: [
-            { id: "fd-link", label: "링크", type: "link" },
+            { id: "fd-link", name: "링크", type: "link" },
           ]},
         ],
         customSections: {
