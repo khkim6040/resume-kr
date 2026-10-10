@@ -79,7 +79,7 @@ function LinkIcon() {
 }
 
 const st = StyleSheet.create({
-  container: { padding: s.padding, fontFamily: "Pretendard" },
+  container: { fontFamily: "Pretendard" },
   // header
   header: {
     borderBottomWidth: 2,
