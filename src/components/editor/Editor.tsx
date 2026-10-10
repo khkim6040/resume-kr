@@ -28,6 +28,7 @@ import AwardsEditor from "./sections/AwardsEditor";
 import CustomSectionEditor from "./sections/CustomSectionEditor";
 import DownloadButton from "./DownloadButton";
 import ImportButton from "./ImportButton";
+import { sampleResume } from "@/lib/sampleResume";
 
 // 각 섹션이 줄바꿈 없이 표시되기 위한 최소 사이드바 너비
 const SECTION_MIN_WIDTHS: Partial<Record<string, number>> = {
@@ -352,7 +353,7 @@ export default function Editor({
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }) {
-  const { data, reorderSections, addCustomSection } = useResumeStore();
+  const { data, reorderSections, addCustomSection, setData } = useResumeStore();
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
   // Prevent hydration mismatch from @dnd-kit aria-describedby IDs
@@ -402,6 +403,17 @@ export default function Editor({
       <div className={`flex items-center gap-2 border-b border-zinc-200 bg-white py-3 ${collapsed ? "justify-center px-2" : "px-5"}`}>
         {!collapsed && (
           <>
+            <button
+              onClick={() => {
+                if (confirm("예시 이력서로 채울까요? 현재 작성 중인 내용은 덮어씌워집니다.")) {
+                  setData(structuredClone(sampleResume));
+                }
+              }}
+              className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              title="어떻게 채울지 모르겠다면 예시 이력서를 불러와 보세요"
+            >
+              예시
+            </button>
             <ImportButton />
             <DownloadButton />
           </>
