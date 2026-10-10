@@ -412,6 +412,9 @@ function SectionContent({ section, data }: { section: Section; data: ResumeData 
   }
 }
 
+// A4 높이(841.89pt)보다 크게 잡아 "섹션 끝까지" 같은 페이지에 있도록 요구한다
+const SECTION_MIN_PRESENCE = 1000;
+
 export function ClassicDocument({ data }: { data: ResumeData }) {
   const { personalInfo, sections } = data;
   const visibleSections = sections
@@ -442,9 +445,13 @@ export function ClassicDocument({ data }: { data: ResumeData }) {
 
       {/* Sections */}
       <View style={st.sections}>
-        {visibleSections.map((section) => (
+        {visibleSections.map((section, i) => (
           <View key={section.id} style={st.sectionBlock}>
-            <Text style={st.sectionTitle}>{section.title}</Text>
+            {/* 섹션이 남은 공간에 다 안 들어가면 섹션째 다음 페이지로 넘긴다. 한 페이지보다 긴 섹션은 새 페이지에서 시작해 나뉜다.
+                react-pdf는 부모의 첫 자식에는 minPresenceAhead를 적용하지 않으므로 높이 0인 View를 앞에 둔다.
+                첫 섹션은 넘기면 헤더만 남은 페이지가 생길 수 있어 제외한다 */}
+            {i > 0 && <View />}
+            <Text style={st.sectionTitle} minPresenceAhead={SECTION_MIN_PRESENCE}>{section.title}</Text>
             <SectionContent section={section} data={data} />
           </View>
         ))}
