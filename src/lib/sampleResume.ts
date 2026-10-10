@@ -72,6 +72,19 @@ export const sampleResume: ResumeData = {
   ],
   projects: [
     {
+      id: "sample-proj-gpu",
+      name: "사내 LLM 추론 배치 스케줄러",
+      role: "핵심 개발",
+      startDate: "2024-03",
+      endDate: "2024-11",
+      isCurrent: false,
+      description: [
+        "요청 길이 기반 동적 배칭으로 NVIDIA H100 클러스터 처리량 1.9배 향상",
+        "Kubernetes 커스텀 오퍼레이터로 GPU 노드 오토스케일링 구현",
+      ],
+      techStack: ["Kotlin", "Kubernetes", "CUDA", "Triton Inference Server"],
+    },
+    {
       id: "sample-proj-ssafy",
       name: "버거 주문 대기열 예측 서비스 '버거타임'",
       role: "백엔드 · 팀장",
@@ -86,24 +99,11 @@ export const sampleResume: ResumeData = {
       techStack: ["Spring Boot", "MySQL", "Redis", "FastAPI", "AWS"],
       link: "https://github.com/junsun-hwang/burger-time",
     },
-    {
-      id: "sample-proj-gpu",
-      name: "사내 LLM 추론 배치 스케줄러",
-      role: "핵심 개발",
-      startDate: "2024-03",
-      endDate: "2024-11",
-      isCurrent: false,
-      description: [
-        "요청 길이 기반 동적 배칭으로 NVIDIA H100 클러스터 처리량 1.9배 향상",
-        "Kubernetes 커스텀 오퍼레이터로 GPU 노드 오토스케일링 구현",
-      ],
-      techStack: ["Kotlin", "Kubernetes", "CUDA", "Triton Inference Server"],
-    },
   ],
   certificates: [
-    { id: "sample-cert-eip", name: "정보처리기사", issuer: "한국산업인력공단", date: "2021-08" },
-    { id: "sample-cert-sqld", name: "SQLD", issuer: "한국데이터산업진흥원", date: "2021-12" },
     { id: "sample-cert-aws", name: "AWS Certified Solutions Architect – Associate", issuer: "Amazon Web Services", date: "2023-05" },
+    { id: "sample-cert-sqld", name: "SQLD", issuer: "한국데이터산업진흥원", date: "2021-12" },
+    { id: "sample-cert-eip", name: "정보처리기사", issuer: "한국산업인력공단", date: "2021-08" },
     { id: "sample-cert-food", name: "한식조리기능사", issuer: "한국산업인력공단", date: "2019-06" },
   ],
   languages: [
@@ -112,18 +112,18 @@ export const sampleResume: ResumeData = {
   ],
   awards: [
     {
-      id: "sample-award-ssafy",
-      name: "자율 프로젝트 우수상",
-      issuer: "삼성전자 (SSAFY)",
-      date: "2022-06",
-      description: "버거 주문 대기열 예측 서비스 '버거타임'",
-    },
-    {
       id: "sample-award-naver",
       name: "NAVER DEVIEW 2024 우수 발표",
       issuer: "네이버",
       date: "2024-11",
       description: "\"주방 동선에서 배운 GPU 배칭\" 세션 발표",
+    },
+    {
+      id: "sample-award-ssafy",
+      name: "자율 프로젝트 우수상",
+      issuer: "삼성전자 (SSAFY)",
+      date: "2022-06",
+      description: "버거 주문 대기열 예측 서비스 '버거타임'",
     },
     {
       id: "sample-award-momstouch",
@@ -187,19 +187,19 @@ export const sampleResume: ResumeData = {
     ],
     "sample-sec-writing": [
       {
-        id: "sample-wr-blog",
-        fields: [
-          { fieldId: "wr-title", value: "맘스터치 알바생이 네이버 개발자가 되기까지" },
-          { fieldId: "wr-date", value: "2022-09" },
-          { fieldId: "wr-link", value: "https://velog.io/@junsun/from-momstouch-to-naver" },
-        ],
-      },
-      {
         id: "sample-wr-deview",
         fields: [
           { fieldId: "wr-title", value: "DEVIEW 2024 — 주방 동선에서 배운 GPU 배칭" },
           { fieldId: "wr-date", value: "2024-11" },
           { fieldId: "wr-link", value: "https://deview.kr" },
+        ],
+      },
+      {
+        id: "sample-wr-blog",
+        fields: [
+          { fieldId: "wr-title", value: "맘스터치 알바생이 네이버 개발자가 되기까지" },
+          { fieldId: "wr-date", value: "2022-09" },
+          { fieldId: "wr-link", value: "https://velog.io/@junsun/from-momstouch-to-naver" },
         ],
       },
     ],
