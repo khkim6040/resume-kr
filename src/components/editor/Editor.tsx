@@ -2,7 +2,7 @@
 
 import { useState, useSyncExternalStore } from "react";
 import { richTextKeyDown } from "@/components/editor/richTextKeys";
-import { validateEmail, validatePhone } from "@/lib/validation";
+import { formatPhone, validateEmail, validatePhone } from "@/lib/validation";
 import {
   DndContext,
   PointerSensor,
@@ -114,10 +114,10 @@ function PersonalInfoEditor() {
         <div>
           <input
             type="tel"
-            placeholder="전화번호"
+            placeholder="010-1234-5678"
             value={personalInfo.phone}
             onChange={(e) => {
-              updatePersonalInfo({ phone: e.target.value });
+              updatePersonalInfo({ phone: formatPhone(e.target.value) });
               if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
             }}
             onBlur={(e) => {
