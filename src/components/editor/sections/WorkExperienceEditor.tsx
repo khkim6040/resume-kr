@@ -81,7 +81,7 @@ export default function WorkExperienceEditor() {
               </label>
             </div>
             <textarea
-              placeholder="업무 내용 (줄바꿈으로 항목 구분) · **굵게** *기울임* __밑줄__"
+              placeholder="업무 내용 (줄바꿈으로 항목 구분)"
               onKeyDown={richTextKeyDown}
               value={item.description.join("\n")}
               onChange={(e) => updateWorkExperience(item.id, { description: e.target.value.split("\n") })}

@@ -81,7 +81,7 @@ export default function ProjectsEditor() {
               </label>
             </div>
             <textarea
-              placeholder="프로젝트 설명 (줄바꿈으로 항목 구분) · **굵게** *기울임* __밑줄__"
+              placeholder="프로젝트 설명 (줄바꿈으로 항목 구분)"
               onKeyDown={richTextKeyDown}
               value={item.description.join("\n")}
               onChange={(e) => updateProject(item.id, { description: e.target.value.split("\n") })}

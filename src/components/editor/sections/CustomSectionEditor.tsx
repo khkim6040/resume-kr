@@ -42,7 +42,6 @@ function DescriptionListInput({
           <span className="text-xs text-zinc-400">•</span>
           <input
             type="text"
-            placeholder="**굵게** *기울임* __밑줄__"
             onKeyDown={richTextKeyDown}
             value={line}
             onChange={(e) => updateLine(i, e.target.value)}

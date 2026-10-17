@@ -162,7 +162,7 @@ function PersonalInfoEditor() {
         className={INPUT}
       />
       <textarea
-        placeholder="자기소개 (선택) · **굵게** *기울임* __밑줄__"
+        placeholder="자기소개 (선택)"
         onKeyDown={richTextKeyDown}
         value={personalInfo.summary ?? ""}
         onChange={(e) => updatePersonalInfo({ summary: e.target.value })}

@@ -54,7 +54,7 @@ export default function AwardsEditor() {
               />
             </div>
             <textarea
-              placeholder="설명 (선택) · **굵게** *기울임* __밑줄__"
+              placeholder="설명 (선택)"
               onKeyDown={richTextKeyDown}
               value={item.description ?? ""}
               onChange={(e) => updateAward(item.id, { description: e.target.value })}
