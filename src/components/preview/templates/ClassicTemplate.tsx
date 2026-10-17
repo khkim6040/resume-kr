@@ -18,6 +18,7 @@ import { sectionHasContent } from "@/lib/sectionHasContent";
 import type { RefObject } from "react";
 import { formatDate } from "./utils";
 import { sanitizeUrl } from "@/lib/sanitizeUrl";
+import { RichText } from "@/components/preview/RichText";
 
 function DateRange({
   startDate,
@@ -87,7 +88,7 @@ function WorkExperienceSection({
                       lineHeight: fs.lineHeight,
                     }}
                   >
-                    {line}
+                    <RichText text={line} />
                   </li>
                 ))}
               </ul>
@@ -142,7 +143,7 @@ function EducationSection({
                 whiteSpace: "pre-line",
               }}
             >
-              {item.description}
+              <RichText text={item.description} />
             </p>
           )}
         </div>
@@ -221,7 +222,7 @@ function ProjectsSection({
                       lineHeight: fs.lineHeight,
                     }}
                   >
-                    {line}
+                    <RichText text={line} />
                   </li>
                 ))}
               </ul>
@@ -330,7 +331,7 @@ function AwardsSection({ items, fs }: { items: Award[]; fs: FitStyles }) {
                 whiteSpace: "pre-line",
               }}
             >
-              {item.description}
+              <RichText text={item.description} />
             </p>
           )}
         </div>
@@ -366,7 +367,7 @@ function CustomSection({
               case "text":
                 return typeof val === "string" && val.trim() ? (
                   <span key={def.id} style={{ fontSize: fs.fontSize - 2 }} className="text-zinc-700 block">
-                    {val}
+                    <RichText text={val} />
                   </span>
                 ) : null;
               case "date":
@@ -389,7 +390,7 @@ function CustomSection({
                   <ul key={def.id} className="mt-1 space-y-0.5 pl-4">
                     {lines.map((line, i) => (
                       <li key={i} className="list-disc text-zinc-700" style={{ fontSize: fs.fontSize - 2, lineHeight: fs.lineHeight }}>
-                        {line}
+                        <RichText text={line} />
                       </li>
                     ))}
                   </ul>
@@ -504,7 +505,7 @@ export function ClassicTemplate({ data, fs, contentRef }: TemplateProps) {
               whiteSpace: "pre-line",
             }}
           >
-            {personalInfo.summary}
+            <RichText text={personalInfo.summary} />
           </p>
         )}
       </div>}

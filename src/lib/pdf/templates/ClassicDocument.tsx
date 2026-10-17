@@ -14,6 +14,7 @@ import type {
 } from "@/types/resume";
 import { COLORS, SIZES } from "../tokens";
 import { formatDate } from "../utils";
+import { PdfRichText } from "../RichText";
 import { sanitizeUrl } from "../../sanitizeUrl";
 import { sectionHasContent } from "../../sectionHasContent";
 
@@ -191,7 +192,7 @@ function WorkExperienceSection({ items }: { items: WorkExperience[] }) {
               <View style={st.bulletList}>
                 {lines.map((line, i) => (
                   <Text key={i} style={st.bulletItem}>
-                    {"•  "}{line}
+                    {"•  "}<PdfRichText text={line} />
                   </Text>
                 ))}
               </View>
@@ -222,7 +223,7 @@ function EducationSection({ items }: { items: Education[] }) {
               {[minor.degree, minor.field].filter(Boolean).join(" ")}
             </Text>
           ))}
-          {item.description ? <Text style={st.desc}>{item.description}</Text> : null}
+          {item.description ? <Text style={st.desc}><PdfRichText text={item.description} /></Text> : null}
         </View>
       ))}
     </View>
@@ -263,7 +264,7 @@ function ProjectsSection({ items }: { items: Project[] }) {
               <View style={st.bulletList}>
                 {lines.map((line, i) => (
                   <Text key={i} style={st.bulletItem}>
-                    {"•  "}{line}
+                    {"•  "}<PdfRichText text={line} />
                   </Text>
                 ))}
               </View>
@@ -323,7 +324,7 @@ function AwardsSection({ items }: { items: Award[] }) {
             </Text>
             <Text style={st.dateText}>{formatDate(item.date)}</Text>
           </View>
-          {item.description ? <Text style={st.desc}>{item.description}</Text> : null}
+          {item.description ? <Text style={st.desc}><PdfRichText text={item.description} /></Text> : null}
         </View>
       ))}
     </View>
@@ -355,7 +356,7 @@ function CustomSectionPdf({
               case "text":
                 return typeof val === "string" && val.trim() ? (
                   <Text key={def.id} style={{ fontSize: s.smallFont, color: c.body }}>
-                    {val}
+                    <PdfRichText text={val} />
                   </Text>
                 ) : null;
               case "date":
@@ -378,7 +379,7 @@ function CustomSectionPdf({
                   <View key={def.id} style={st.bulletList}>
                     {lines.map((line, i) => (
                       <Text key={i} style={st.bulletItem}>
-                        {"•  "}{line}
+                        {"•  "}<PdfRichText text={line} />
                       </Text>
                     ))}
                   </View>
@@ -439,7 +440,7 @@ export function ClassicDocument({ data }: { data: ResumeData }) {
           {safeWebsite ? <Link src={safeWebsite} style={{textDecoration: 'none'}}><WebsiteIcon /></Link> : null}
         </View>
         {personalInfo.summary ? (
-          <Text style={st.summary}>{personalInfo.summary}</Text>
+          <Text style={st.summary}><PdfRichText text={personalInfo.summary} /></Text>
         ) : null}
       </View>
 
