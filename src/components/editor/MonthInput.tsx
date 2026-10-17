@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef, useEffect, type ChangeEvent } from "react";
+import { useState, useCallback, useRef, type ChangeEvent } from "react";
 
 interface MonthInputProps {
   value: string;
@@ -56,11 +56,11 @@ export default function MonthInput({
   const [isFocused, setIsFocused] = useState(false);
 
   // Sync draft from external value changes when not focused
-  useEffect(() => {
-    if (!isFocused) {
-      setDraft(toDisplay(value));
-    }
-  }, [value, isFocused]);
+  const [lastValue, setLastValue] = useState(value);
+  if (value !== lastValue) {
+    setLastValue(value);
+    if (!isFocused) setDraft(toDisplay(value));
+  }
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
