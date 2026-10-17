@@ -269,7 +269,8 @@ export const useResumeStore = create<ResumeStore>()(
 
         removeCustomSection: (sectionId) =>
           vSet((state) => {
-            const { [sectionId]: _, ...rest } = state.data.customSections;
+            const rest = { ...state.data.customSections };
+            delete rest[sectionId];
             return {
               data: {
                 ...state.data,

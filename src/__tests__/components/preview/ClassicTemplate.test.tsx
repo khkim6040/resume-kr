@@ -359,4 +359,18 @@ describe("ClassicTemplate", () => {
       expect(headings[1].textContent).toBe("경력");
     });
   });
+
+  it("설명 줄의 **굵게**, *기울임* 마크업을 strong/em으로 렌더링한다", () => {
+    const data = makeData({
+      workExperience: [{
+        id: "w1", company: "회사", position: "", startDate: "2020-01", isCurrent: true,
+        description: ["**핵심** 성과 *달성* __밑줄__"],
+      }],
+    });
+    const { container } = render(<ClassicTemplate data={data} fs={defaultFs} contentRef={createRef()} />);
+    expect(container.querySelector("strong")?.textContent).toBe("핵심");
+    expect(container.querySelector("em")?.textContent).toBe("달성");
+    expect(container.querySelector("u")?.textContent).toBe("밑줄");
+    expect(container.textContent).not.toMatch(/[*_]/);
+  });
 });

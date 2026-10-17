@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import { useResumeStore } from "@/store/resume";
 import type { CustomFieldDefinition, CustomFieldType, CustomFieldValue, CustomSectionItem, Section } from "@/types/resume";
 import { SortableList } from "../SortableList";
@@ -41,6 +42,7 @@ function DescriptionListInput({
           <span className="text-xs text-zinc-400">•</span>
           <input
             type="text"
+            onKeyDown={richTextKeyDown}
             value={line}
             onChange={(e) => updateLine(i, e.target.value)}
             className={`${INPUT} flex-1`}
@@ -192,6 +194,7 @@ export default function CustomSectionEditor({ section }: { section: Section }) {
                       key={def.id}
                       type="text"
                       placeholder={def.name}
+                      onKeyDown={richTextKeyDown}
                       value={typeof val === "string" ? val : ""}
                       onChange={(e) => setFieldValue(item, def.id, e.target.value)}
                       className={INPUT}

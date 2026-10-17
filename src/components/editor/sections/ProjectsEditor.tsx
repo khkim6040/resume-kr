@@ -1,6 +1,7 @@
 "use client";
 
 import { useResumeStore } from "@/store/resume";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import type { Project } from "@/types/resume";
 import TagInput from "../TagInput";
 import { SortableList } from "../SortableList";
@@ -81,6 +82,7 @@ export default function ProjectsEditor() {
             </div>
             <textarea
               placeholder="프로젝트 설명 (줄바꿈으로 항목 구분)"
+              onKeyDown={richTextKeyDown}
               value={item.description.join("\n")}
               onChange={(e) => updateProject(item.id, { description: e.target.value.split("\n") })}
               rows={3}

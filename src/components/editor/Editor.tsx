@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import { validateEmail, validatePhone } from "@/lib/validation";
 import {
   DndContext,
@@ -162,6 +163,7 @@ function PersonalInfoEditor() {
       />
       <textarea
         placeholder="자기소개 (선택)"
+        onKeyDown={richTextKeyDown}
         value={personalInfo.summary ?? ""}
         onChange={(e) => updatePersonalInfo({ summary: e.target.value })}
         rows={3}
@@ -357,8 +359,7 @@ export default function Editor({
   const sorted = [...data.sections].sort((a, b) => a.order - b.order);
 
   // Prevent hydration mismatch from @dnd-kit aria-describedby IDs
-  const [isMounted, setIsMounted] = useState(false);
-  useEffect(() => setIsMounted(true), []);
+  const isMounted = useSyncExternalStore(() => () => {}, () => true, () => false);
 
   // Accordion state: first section expanded by default
   const [expandedIds, setExpandedIds] = useState<Set<string>>(

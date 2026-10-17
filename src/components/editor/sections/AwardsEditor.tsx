@@ -1,6 +1,7 @@
 "use client";
 
 import { useResumeStore } from "@/store/resume";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import type { Award } from "@/types/resume";
 import { SortableList } from "../SortableList";
 import MonthInput from "../MonthInput";
@@ -54,6 +55,7 @@ export default function AwardsEditor() {
             </div>
             <textarea
               placeholder="설명 (선택)"
+              onKeyDown={richTextKeyDown}
               value={item.description ?? ""}
               onChange={(e) => updateAward(item.id, { description: e.target.value })}
               rows={2}

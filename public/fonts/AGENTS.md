@@ -4,7 +4,7 @@
 # fonts
 
 ## Purpose
-Pretendard 한글 폰트 정적 TTF 파일. 4가지 웨이트 제공.
+Pretendard 한글 폰트 정적 TTF 파일. 4가지 웨이트 + 합성 이탤릭 2종 제공.
 
 ## Key Files
 
@@ -14,6 +14,8 @@ Pretendard 한글 폰트 정적 TTF 파일. 4가지 웨이트 제공.
 | `Pretendard-Medium.ttf` | 500 웨이트 — 중간 강조 |
 | `Pretendard-SemiBold.ttf` | 600 웨이트 — 소제목 |
 | `Pretendard-Bold.ttf` | 700 웨이트 — 제목 |
+| `Pretendard-Italic.ttf` | 400 이탤릭 — PDF 인라인 `*기울임*` 전용, `scripts/make-oblique.py`로 합성 |
+| `Pretendard-BoldItalic.ttf` | 700 이탤릭 — PDF 인라인 `***굵은 기울임***` 전용, 합성 |
 
 ## For AI Agents
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useResumeStore } from "@/store/resume";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import type { WorkExperience } from "@/types/resume";
 import { SortableList } from "../SortableList";
 import MonthInput from "../MonthInput";
@@ -81,6 +82,7 @@ export default function WorkExperienceEditor() {
             </div>
             <textarea
               placeholder="업무 내용 (줄바꿈으로 항목 구분)"
+              onKeyDown={richTextKeyDown}
               value={item.description.join("\n")}
               onChange={(e) => updateWorkExperience(item.id, { description: e.target.value.split("\n") })}
               rows={3}
