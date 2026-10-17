@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { richTextKeyDown } from "@/components/editor/richTextKeys";
 import { validateEmail, validatePhone } from "@/lib/validation";
 import {
   DndContext,
@@ -161,7 +162,8 @@ function PersonalInfoEditor() {
         className={INPUT}
       />
       <textarea
-        placeholder="자기소개 (선택)"
+        placeholder="자기소개 (선택) · **굵게** *기울임* __밑줄__"
+        onKeyDown={richTextKeyDown}
         value={personalInfo.summary ?? ""}
         onChange={(e) => updatePersonalInfo({ summary: e.target.value })}
         rows={3}
